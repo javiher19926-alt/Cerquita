@@ -497,7 +497,7 @@ footer{padding-bottom:max(40px,env(safe-area-inset-bottom))}
 <script>
 {
 const WA_NUMBER = "50587072125";
-const API_URL = ""; // Pegá aquí la URL de la aplicación web de Google Apps Script (termina en /exec)
+const API_URL = "relay";
 const CATS = [
   ["super","Súper / canasta",1],["farmacia","Farmacia",1],["pastel","Pastel y regalos",1],["servicios","Pago de servicios",1],
   ["acomp","Acompañar a cita o trámite",2],["materiales","Materiales de construcción",3],["electro","Electrodomésticos / muebles",3],["libre","Otro encargo",1]];
@@ -634,9 +634,26 @@ $("f").addEventListener("submit",e=>{
     .catch(()=>{reg.textContent="No pudimos registrarlo automáticamente. Envialo por WhatsApp."});
   } else reg.textContent="";
 });
+/* ---------- Envío cifrado de pedidos ---------- */
+const RELAY="https://ntfy.sh",TOPIC="cq-ef817c85b1227de3febc071a9a987fa348c5",TEAM_PUB={"kty": "EC", "crv": "P-256", "x": "LVpou9kMsnxyoDoxeUrwFGvku7xZi9pIHeIxWm2h6mk", "y": "4AD8t2bQjcrP0_jS06W1HlxeYe-QKcGzxFLttl5wqqA"};
+const B64=u=>{let s="";for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(s)};
+async function packBytes(str){const raw=new TextEncoder().encode(str);
+  if(window.CompressionStream){try{const st=new Blob([raw]).stream().pipeThrough(new CompressionStream("deflate-raw"));return {z:1,b:new Uint8Array(await new Response(st).arrayBuffer())}}catch(e){}}
+  return {z:0,b:raw}}
+async function seal(obj){const {z,b}=await packBytes(JSON.stringify(obj));
+  const pub=await crypto.subtle.importKey("jwk",Object.assign({ext:true},TEAM_PUB),{name:"ECDH",namedCurve:"P-256"},false,[]);
+  const eph=await crypto.subtle.generateKey({name:"ECDH",namedCurve:"P-256"},true,["deriveKey"]);
+  const key=await crypto.subtle.deriveKey({name:"ECDH",public:pub},eph.privateKey,{name:"AES-GCM",length:256},false,["encrypt"]);
+  const iv=crypto.getRandomValues(new Uint8Array(12)),ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv},key,b));
+  const e=await crypto.subtle.exportKey("jwk",eph.publicKey);return JSON.stringify({v:1,z,x:e.x,y:e.y,i:B64(iv),c:B64(ct)})}
+async function relayPublish(obj,title,quiet){const payload=await seal(obj),id=Math.random().toString(36).slice(2,10),parts=[];
+  for(let i=0;i<payload.length;i+=3000)parts.push(payload.slice(i,i+3000));
+  for(let n=0;n<parts.length;n++){const msg=parts.length>1?JSON.stringify({m:id,p:n,n:parts.length,d:parts[n]}):payload;
+    const r=await fetch(RELAY+"/",{method:"POST",body:JSON.stringify(Object.assign({topic:TOPIC,message:msg,title:title||"Cerquita"},quiet?{priority:1}:{priority:4,tags:["package"]}))});
+    if(!r.ok)throw new Error("relay "+r.status)}
+  return true}
 
-async function api(body){if(!API_URL)throw new Error("sin-api");
-  const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)});return r.json()}
+async function api(body){if(body.action==="nuevo"){await relayPublish({t:"pedido",p:body.pedido},"Nuevo pedido "+body.pedido.codigo);return {ok:true}}return {ok:false,error:"accion"}}
 const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 function storeOrder(code,o){const m=lsGet("cerquita-orders",{});m[code]=Object.assign({},m[code]||{},Object.fromEntries(Object.entries(o).filter(([,v])=>v!==""&&v!=null)));

@@ -535,7 +535,7 @@ body.locked #gate{display:flex}
 <section id="vPanel">
   
   <h2 style="font-size:clamp(28px,4vw,40px);margin:14px 0 6px">Panel de pedidos</h2>
-  <p style="color:var(--mute);margin:0">Pedidos registrados en la hoja «Pedidos Cerquita». Se actualiza solo cada 30 segundos y te avisa cuando entra un pedido nuevo.</p>
+  <p style="color:var(--mute);margin:0">Pedidos recibidos desde la app Cerquita. Se actualiza solo y te avisa cuando entra un pedido nuevo.</p>
   <div id="pLogin" style="margin-top:20px">
     <fieldset>
       <legend>Acceso del equipo</legend>
@@ -570,10 +570,77 @@ body.locked #gate{display:flex}
 <script>
 {
 const WA_NUMBER = "50587072125";
-const API_URL = ""; // Pegá aquí la URL de la aplicación web de Google Apps Script (termina en /exec)
+const API_URL = "relay";
 const TEAM_HASH = "f5c21146f57ee06e012c7df00cd15c47ee0b47451149e2d105ae02fae233652e";
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+/* ---------- Envío cifrado de pedidos ---------- */
+const RELAY="https://ntfy.sh",TOPIC="cq-ef817c85b1227de3febc071a9a987fa348c5",TEAM_PUB={"kty": "EC", "crv": "P-256", "x": "LVpou9kMsnxyoDoxeUrwFGvku7xZi9pIHeIxWm2h6mk", "y": "4AD8t2bQjcrP0_jS06W1HlxeYe-QKcGzxFLttl5wqqA"};
+const B64=u=>{let s="";for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(s)};
+async function packBytes(str){const raw=new TextEncoder().encode(str);
+  if(window.CompressionStream){try{const st=new Blob([raw]).stream().pipeThrough(new CompressionStream("deflate-raw"));return {z:1,b:new Uint8Array(await new Response(st).arrayBuffer())}}catch(e){}}
+  return {z:0,b:raw}}
+async function seal(obj){const {z,b}=await packBytes(JSON.stringify(obj));
+  const pub=await crypto.subtle.importKey("jwk",Object.assign({ext:true},TEAM_PUB),{name:"ECDH",namedCurve:"P-256"},false,[]);
+  const eph=await crypto.subtle.generateKey({name:"ECDH",namedCurve:"P-256"},true,["deriveKey"]);
+  const key=await crypto.subtle.deriveKey({name:"ECDH",public:pub},eph.privateKey,{name:"AES-GCM",length:256},false,["encrypt"]);
+  const iv=crypto.getRandomValues(new Uint8Array(12)),ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv},key,b));
+  const e=await crypto.subtle.exportKey("jwk",eph.publicKey);return JSON.stringify({v:1,z,x:e.x,y:e.y,i:B64(iv),c:B64(ct)})}
+async function relayPublish(obj,title,quiet){const payload=await seal(obj),id=Math.random().toString(36).slice(2,10),parts=[];
+  for(let i=0;i<payload.length;i+=3000)parts.push(payload.slice(i,i+3000));
+  for(let n=0;n<parts.length;n++){const msg=parts.length>1?JSON.stringify({m:id,p:n,n:parts.length,d:parts[n]}):payload;
+    const r=await fetch(RELAY+"/",{method:"POST",body:JSON.stringify(Object.assign({topic:TOPIC,message:msg,title:title||"Cerquita"},quiet?{priority:1}:{priority:4,tags:["package"]}))});
+    if(!r.ok)throw new Error("relay "+r.status)}
+  return true}
+/* ---------- Base de pedidos dentro de la app ---------- */
+const PRIV_ENC={"s": "blTtQ65Pw2qKLLKgryRB4Q==", "i": "4Ta6ScJcXYHgaqV7", "c": "S6im09YGQjm5Y3D44iTPACF13wxfQpfB3XgIKJUno2kZpeXaPaD1zlsCDIGi9R0pA3spVtNSgDau/6uBcy6dYtqiN0DzbnR3swmWFMNfAoU66yforiRCF0Dm4G8eBfuvJLGANtavjmxj7hvvFdQZ3M1ycyG3kYdxMvtvkw2rRMT+7xws6Wyn1ow/benU4sdOYXXxNXSkfN9wvO3e38mH3w66y8OoUUU5p3tBi0RX02CnSYE95CKE3KGH0kDhyyXrfBnLJRkn0DlGPl4X+gY04sNThnQateHYv3Mk3ew+SSeWfsM="};
+const unB64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+let PRIV=null;
+async function openPriv(pass){if(PRIV)return PRIV;
+  const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pass),"PBKDF2",false,["deriveKey"]);
+  const k=await crypto.subtle.deriveKey({name:"PBKDF2",salt:unB64(PRIV_ENC.s),iterations:250000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["decrypt"]);
+  const jwk=JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:unB64(PRIV_ENC.i)},k,unB64(PRIV_ENC.c))));
+  PRIV=await crypto.subtle.importKey("jwk",jwk,{name:"ECDH",namedCurve:"P-256"},false,["deriveKey"]);return PRIV}
+async function unseal(str){const o=JSON.parse(str);
+  const epk=await crypto.subtle.importKey("jwk",{kty:"EC",crv:"P-256",x:o.x,y:o.y,ext:true},{name:"ECDH",namedCurve:"P-256"},false,[]);
+  const key=await crypto.subtle.deriveKey({name:"ECDH",public:epk},PRIV,{name:"AES-GCM",length:256},false,["decrypt"]);
+  let b=new Uint8Array(await crypto.subtle.decrypt({name:"AES-GCM",iv:unB64(o.i)},key,unB64(o.c)));
+  if(o.z){const st=new Blob([b]).stream().pipeThrough(new DecompressionStream("deflate-raw"));b=new Uint8Array(await new Response(st).arrayBuffer())}
+  return JSON.parse(new TextDecoder().decode(b))}
+const fmtT=t=>new Date(t*1000).toLocaleString("es-NI",{timeZone:"America/Managua",day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
+function dbGet(){return lsGet("cq-db",{})}function dbSet(d){lsSet("cq-db",d)}
+function applyEv(db,ev,t){
+  if(ev.t==="pedido"&&ev.p&&ev.p.codigo){const c=ev.p.codigo,cur=db[c];
+    if(!cur||!cur._t)db[c]=Object.assign({},ev.p,cur||{},{codigo:c,estado:(cur&&cur.estado)||"Solicitud",fecha:fmtT(t),_t:t,_st:(cur&&cur._st)||t});
+    else for(const [k,v] of Object.entries(ev.p))if(cur[k]==null||cur[k]==="")cur[k]=v}
+  else if(ev.t==="estado"&&ev.c){const r=db[ev.c]||(db[ev.c]={codigo:ev.c,_t:t,fecha:fmtT(t)});
+    if(!r._st||t>=r._st){r.estado=ev.e;r._st=t}if(ev.x)Object.assign(r,ev.x)}}
+let syncing=null;
+async function syncFeed(){if(syncing)return syncing;syncing=(async()=>{
+  const since=lsGet("cq-since",0),seenIds=new Set(lsGet("cq-seen-ids",[])),chunks=lsGet("cq-chunks",{});
+  const r=await fetch(`${RELAY}/${TOPIC}/json?poll=1&since=${since?since:"12h"}`);if(!r.ok)throw new Error("relay "+r.status);
+  const lines=(await r.text()).split("\n").filter(Boolean);const db=dbGet();let maxT=since;
+  for(const ln of lines){let m;try{m=JSON.parse(ln)}catch(e){continue}
+    if(m.event!=="message"||seenIds.has(m.id))continue;seenIds.add(m.id);maxT=Math.max(maxT,m.time||0);
+    let payload=m.message;
+    try{const pj=JSON.parse(payload);if(pj&&pj.m&&pj.d!=null){const c=chunks[pj.m]||(chunks[pj.m]={n:pj.n,p:{},t:m.time});c.p[pj.p]=pj.d;
+        if(Object.keys(c.p).length<c.n)continue;payload=Array.from({length:c.n},(_,i)=>c.p[i]).join("");delete chunks[pj.m]}}catch(e){}
+    try{applyEv(db,await unseal(payload),m.time)}catch(e){}}
+  dbSet(db);lsSet("cq-since",maxT);lsSet("cq-seen-ids",[...seenIds].slice(-800));
+  const now=Date.now()/1000;for(const k of Object.keys(chunks))if(now-chunks[k].t>43200)delete chunks[k];lsSet("cq-chunks",chunks);
+})();try{await syncing}finally{syncing=null}}
+function listLocal(){return Object.values(dbGet()).filter(o=>o.codigo).sort((a,b)=>(b._t||0)-(a._t||0))}
+async function teamUpdate(codigo,estado,extra){const t=Math.floor(Date.now()/1000),db=dbGet();
+  applyEv(db,{t:"estado",c:codigo,e:estado,x:extra||{}},t);dbSet(db);
+  try{await relayPublish({t:"estado",c:codigo,e:estado,x:extra||{}},"Actualización interna",true);return {ok:true}}
+  catch(e){return {ok:true,offline:true}}}
+async function api(body){
+  if(body.action==="listar"){try{await openPriv(body.key)}catch(e){return {ok:false,error:"clave"}}
+    let offline=false;try{await syncFeed()}catch(e){offline=true}return {ok:true,offline,pedidos:listLocal()}}
+  if(body.action==="aceptar"){const tot=Number(body.total)||0;
+    return teamUpdate(body.codigo,"Cotización",{fechaAceptacion:body.fechaAceptacion,aceptadoPor:body.aceptadoPor,moneda:body.moneda,total:tot.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})})}
+  if(body.action==="estado")return teamUpdate(body.codigo,body.estado);
+  return {ok:false,error:"accion"}}
 /* ---------- Registro de entrega ---------- */
 const cv=$("sig"),ctx=cv.getContext("2d");let drawing=false,signed=false,photoURL="",proofText="";
 function sizeCv(){const r=cv.getBoundingClientRect();if(!r.width)return;const d=window.devicePixelRatio||1;
@@ -699,10 +766,10 @@ $("h").addEventListener("submit",e=>{
     `Productos: ${cur} ${money(P)}`,`Entrega: ${cur} ${money(S)}`,`Servicio: ${cur} ${money(Fe)}`,`*Total a transferir: ${cur} ${money(T)}*`,
     bank?`\nDatos para la transferencia:\n${bank}`:"",``,`Cotización válida hasta el ${venceTxt}.`,`Aceptado por: ${$("aName").value.trim()}, ${$("aRole").value.trim()}`].filter(l=>l!==null).join("\n");
   $("uCode").value=code;$("uOut").textContent=aviso();
-  if(API_URL&&pKey){$("dMsg").textContent="Registrando la aceptación en la hoja de pedidos…";
+  if(API_URL&&pKey){$("dMsg").textContent="Registrando la aceptación en el panel de pedidos…";
     api({action:"aceptar",key:pKey,codigo:code,fechaAceptacion:fecha+" "+hora,aceptadoPor:$("aName").value.trim()+", "+$("aRole").value.trim(),moneda:cur,total:T})
-    .then(r=>{$("dMsg").textContent=r&&r.ok?"Aceptación registrada en la hoja de pedidos ✓ Ya podés enviar la constancia en PDF.":"La constancia está lista, pero no se pudo registrar en la hoja ("+(r&&r.error||"error")+")."; if(r&&r.ok)loadOrders()})
-    .catch(()=>{$("dMsg").textContent="La constancia está lista, pero no se pudo registrar en la hoja. Revisá tu conexión."});}
+    .then(r=>{$("dMsg").textContent=r&&r.ok?"Aceptación registrada en el panel de pedidos ✓ Ya podés enviar la constancia en PDF.":"La constancia está lista, pero no se pudo registrar en el panel ("+(r&&r.error||"error")+")."; if(r&&r.ok)loadOrders()})
+    .catch(()=>{$("dMsg").textContent="La constancia está lista, pero no se pudo registrar en el panel. Revisá tu conexión."});}
   $("h").style.display="none";$("docWrap").style.display="block";$("docWrap").scrollIntoView({behavior:"smooth",block:"start"});
 });
 $("dCopy").addEventListener("click",()=>sendPdf($("doc"),"Constancia-"+(lastDocNo||"pedido")+".pdf",$("aWa").value,docText,$("dMsg"),"Constancia de aceptación de pedido"));
@@ -822,7 +889,7 @@ $("k").addEventListener("submit",e=>{
   rText=[`*Cerquita · Recibo oficial de pago*`,`Recibo N.º ${no} · Pedido ${code}`,`Paso 3 de 6 · Pago confirmado ✓`,``,`Recibimos de ${$("kClient").value.trim()} la cantidad de ${m} (${words}).`,`Referencia: ${$("kRef").value.trim()}`,`Emitido el ${fecha} a las ${hora}.`,``,`Lo que sigue: paso 4, preparamos tu pedido y te enviamos la factura escaneada.`].join("\n");
   $("k").style.display="none";$("kOut").style.display="block";$("rMsg").textContent="";$("vMsg").textContent="";
   $("kOut").scrollIntoView({behavior:"smooth",block:"start"});
-  if(API_URL&&pKey)api({action:"estado",key:pKey,codigo:code,estado:"Pago"}).then(r=>{$("rMsg").textContent=r&&r.ok?"Pago registrado en la hoja de pedidos ✓ El pedido pasó a la etapa «Pago».":"El recibo está listo, pero no se pudo actualizar la hoja.";if(r&&r.ok)loadOrders()}).catch(()=>{});
+  if(API_URL&&pKey)api({action:"estado",key:pKey,codigo:code,estado:"Pago"}).then(r=>{$("rMsg").textContent=r&&r.ok?"Pago registrado en el panel de pedidos ✓ El pedido pasó a la etapa «Pago».":"El recibo está listo, pero no se pudo sincronizar el estado.";if(r&&r.ok)loadOrders()}).catch(()=>{});
 });
 $("rSend").addEventListener("click",()=>sendPdf($("rDoc"),"Recibo-"+vNo+".pdf",$("kWa").value,rText,$("rMsg"),"Recibo oficial de pago"));
 $("rDown").addEventListener("click",()=>downPdf($("rDoc"),"Recibo-"+vNo+".pdf",$("rMsg")));
@@ -922,8 +989,7 @@ async function sendPdf(el,name,phone,text,msg,title,fmt){
 }
 
 /* ---------- Panel de pedidos ---------- */
-async function api(body){if(!API_URL)throw new Error("sin-api");
-  const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)});return r.json()}
+
 const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let pKey=lsGet("cerquita-key",""),orders=[],pFilter="nuevos",known=null,pTimer=null,baseTitle=document.title;
@@ -948,7 +1014,7 @@ async function loadOrders(){
     document.title=nuevos.length?`(${nuevos.length}) Nuevos pedidos · Cerquita`:baseTitle;
     $("pStatus").textContent="Actualizado a las "+new Date().toLocaleTimeString("es-NI",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
     if(document.body.dataset.view==="panel")renderPanel();
-  }catch(e){$("pStatus").textContent="No se pudo conectar con la hoja de pedidos. Reintentando…"}
+  }catch(e){$("pStatus").textContent="No se pudo conectar con el servicio de pedidos. Reintentando…"}
 }
 function startPolling(){clearInterval(pTimer);if(API_URL&&pKey){loadOrders();pTimer=setInterval(loadOrders,30000)}}
 function renderPanel(){
@@ -996,7 +1062,7 @@ $("pEnter").addEventListener("click",async()=>{const k=$("pKeyIn").value.trim();
   $("pLoginMsg").textContent="Verificando…";
   try{const r=await api({action:"listar",key:k});if(r&&r.ok){pKey=k;lsSet("cerquita-key",k);$("pLoginMsg").textContent="";orders=r.pedidos||[];known=new Set(orders.map(o=>o.codigo));renderPanel();startPolling()}
     else $("pLoginMsg").textContent=r&&r.error==="clave"?"La clave no es correcta.":"No se pudo entrar."}
-  catch(e){$("pLoginMsg").textContent="No se pudo conectar con la hoja de pedidos."}});
+  catch(e){$("pLoginMsg").textContent="No se pudo conectar con el servicio de pedidos."}});
 $("pKeyIn").addEventListener("keydown",e=>{if(e.key==="Enter")$("pEnter").click()});
 $("pRefresh").addEventListener("click",loadOrders);
 $("pOut").addEventListener("click",()=>{pKey="";lsSet("cerquita-key","");clearInterval(pTimer);orders=[];known=null;document.title=baseTitle;renderPanel()});
@@ -1008,7 +1074,7 @@ startPolling();
 
 async function sha(t){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
 function unlocked(){return lsGet("cerquita-team","")===TEAM_HASH}
-function lock(){lsSet("cerquita-team","");pKey="";lsSet("cerquita-key","");clearInterval(pTimer);orders=[];known=null;document.body.classList.add("locked");$("gKey").value="";setTimeout(()=>$("gKey").focus(),50)}
+function lock(){PRIV=null;lsSet("cerquita-team","");pKey="";lsSet("cerquita-key","");clearInterval(pTimer);orders=[];known=null;document.body.classList.add("locked");$("gKey").value="";setTimeout(()=>$("gKey").focus(),50)}
 async function tryUnlock(){const k=$("gKey").value.trim();if(!k)return;$("gMsg").textContent="";
   let h="";try{h=await sha(k)}catch(e){$("gMsg").textContent="Este navegador no permite verificar la clave. Abrí la app desde su enlace https.";return}
   if(h!==TEAM_HASH){$("gMsg").textContent="La clave no es correcta.";return}
