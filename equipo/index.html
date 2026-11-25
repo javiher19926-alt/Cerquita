@@ -328,15 +328,19 @@ body.locked #gate{display:flex}
   <svg width="40" height="40" viewBox="0 0 120 120" aria-hidden="true"><path d="M88.3 26.3 A44 44 0 1 0 88.3 93.7" fill="none" stroke="#F7F5F0" stroke-width="15" stroke-linecap="round"/><circle cx="88.3" cy="26.3" r="10" fill="#13A89E"/><path d="M60 76 C 45 65, 42 55, 49 49 C 54 45, 60 48, 60 53 C 60 48, 66 45, 71 49 C 78 55, 75 65, 60 76 Z" fill="#F08A4B"/></svg>
   <span class="brand">cerquita</span><span class="eq">Equipo</span>
   <button type="button" class="instbtn" id="instBtn">Instalar app</button>
+  <button type="button" class="instbtn" id="bioBtn">Activar huella</button>
   <button type="button" class="instbtn on" id="lockBtn">Cerrar sesión</button>
 </div>
 <nav class="tnav" aria-label="Secciones del equipo">
   <a href="#panel" data-v="panel">Pedidos <span class="nb" id="navNew"></span></a><a href="#aceptar" data-v="aceptar">Aceptar</a><a href="#pago" data-v="pago">Pago</a><a href="#avisos" data-v="avisos">Avisos</a><a href="#entrega" data-v="entrega">Entrega</a>
 </nav></header>
+<div class="toast" id="bioOffer" role="dialog" aria-label="Activar huella" style="bottom:auto;top:20px"><span>¿Querés entrar con tu huella la próxima vez?</span><button type="button" class="btn main" id="bioYes" style="min-height:40px">Activar</button><button type="button" class="btn sec" id="bioNo" style="min-height:40px;color:#fff;border-color:rgba(255,255,255,.4)">Ahora no</button></div>
 <section id="gate"><div class="gbox">
   <svg width="72" height="72" viewBox="0 0 120 120" aria-hidden="true"><path d="M88.3 26.3 A44 44 0 1 0 88.3 93.7" fill="none" stroke="#0B2545" stroke-width="15" stroke-linecap="round"/><circle cx="88.3" cy="26.3" r="10" fill="#13A89E"/><path d="M60 76 C 45 65, 42 55, 49 49 C 54 45, 60 48, 60 53 C 60 48, 66 45, 71 49 C 78 55, 75 65, 60 76 Z" fill="#F08A4B"/></svg>
   <h1 style="font-size:30px;margin:10px 0 4px">Cerquita Equipo</h1>
   <p style="color:var(--mute);margin:0 0 18px;text-align:center">Acceso exclusivo para el personal de Cerquita.</p>
+  <button type="button" class="btn main" id="gBio" style="width:100%;display:none;margin-bottom:16px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 11c0 3-1 6-3 8"/><path d="M8 4.5a8 8 0 0 1 12 6.9c0 1.6-.2 3.1-.6 4.6"/><path d="M5 8a8 8 0 0 0-1 4c0 1.2.2 2.3.6 3.3"/><path d="M9 11a3 3 0 0 1 6 0c0 2.7-.6 5.3-1.8 7.6"/><path d="M12 7a4 4 0 0 0-4 4c0 1.3-.2 2.6-.6 3.8"/></svg>Entrar con huella</button>
+  <p class="hint" id="gOr" style="display:none;margin:0 0 10px">o con la clave del equipo</p>
   <label style="width:100%"><span>Clave del equipo</span><input id="gKey" type="password" autocomplete="current-password"></label>
   <button type="button" class="btn main" id="gGo" style="width:100%;margin-top:12px">Entrar</button>
   <p class="badc" id="gMsg" style="margin:10px 0 0;min-height:1.5em" aria-live="assertive"></p>
@@ -1008,10 +1012,42 @@ function lock(){lsSet("cerquita-team","");pKey="";lsSet("cerquita-key","");clear
 async function tryUnlock(){const k=$("gKey").value.trim();if(!k)return;$("gMsg").textContent="";
   let h="";try{h=await sha(k)}catch(e){$("gMsg").textContent="Este navegador no permite verificar la clave. Abrí la app desde su enlace https.";return}
   if(h!==TEAM_HASH){$("gMsg").textContent="La clave no es correcta.";return}
-  lsSet("cerquita-team",h);pKey=k;lsSet("cerquita-key",k);document.body.classList.remove("locked");route();startPolling()}
+  lsSet("cerquita-team",h);pKey=k;lsSet("cerquita-key",k);document.body.classList.remove("locked");route();startPolling();
+  if(bioEnrolled())lsSet("cerquita-bio-k",k);
+  const st=await bioRefresh();if(st.av&&!st.en&&!lsGet("cerquita-bio-asked",false))$("bioOffer").classList.add("on")}
+/* --- Entrada con huella (WebAuthn, autenticador del teléfono) --- */
+const b64u=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+const unb64u=s=>Uint8Array.from(atob(s.replace(/-/g,"+").replace(/_/g,"/")+"===".slice((s.length+3)%4)),c=>c.charCodeAt(0));
+const rnd=n=>crypto.getRandomValues(new Uint8Array(n));
+async function bioAvailable(){try{return !!(window.PublicKeyCredential&&await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())}catch(e){return false}}
+const bioEnrolled=()=>!!lsGet("cerquita-bio","");
+async function bioRefresh(){const av=await bioAvailable(),en=bioEnrolled();
+  $("gBio").style.display=av&&en?"":"none";$("gOr").style.display=av&&en?"":"none";
+  $("bioBtn").classList.toggle("on",av&&!en);
+  return {av,en}}
+async function bioEnroll(){
+  try{const cred=await navigator.credentials.create({publicKey:{challenge:rnd(32),rp:{name:"Cerquita Equipo"},
+      user:{id:rnd(16),name:"equipo@cerquita",displayName:"Equipo Cerquita"},
+      pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],
+      authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required",residentKey:"preferred"},timeout:60000,attestation:"none"}});
+    if(!cred)return false;lsSet("cerquita-bio",b64u(cred.rawId));lsSet("cerquita-bio-k",pKey);bioRefresh();
+    $("pStatus").textContent="Entrada con huella activada ✓ La próxima vez podés entrar con tu huella.";return true}
+  catch(e){$("pStatus").textContent=e&&e.name==="NotAllowedError"?"Activación de huella cancelada.":"Este teléfono no permitió activar la huella.";return false}}
+async function bioLogin(){
+  const id=lsGet("cerquita-bio","");if(!id)return;$("gMsg").textContent="";
+  try{const a=await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:"public-key",id:unb64u(id),transports:["internal","hybrid"]}],userVerification:"required",timeout:60000}});
+    if(!a)return;const k=lsGet("cerquita-bio-k","");let h="";try{h=await sha(k)}catch(e){}
+    if(h!==TEAM_HASH){$("gMsg").textContent="La huella es válida, pero la clave guardada cambió. Entrá con la clave y volvé a activar la huella.";lsSet("cerquita-bio","");bioRefresh();return}
+    lsSet("cerquita-team",h);pKey=k;lsSet("cerquita-key",k);document.body.classList.remove("locked");route();startPolling()}
+  catch(e){$("gMsg").textContent=e&&e.name==="NotAllowedError"?"No se reconoció la huella o se canceló. Probá de nuevo o usá la clave.":"No se pudo usar la huella en este dispositivo."}}
+$("gBio").addEventListener("click",bioLogin);
+$("bioBtn").addEventListener("click",bioEnroll);
+$("bioYes").addEventListener("click",async()=>{$("bioOffer").classList.remove("on");await bioEnroll()});
+$("bioNo").addEventListener("click",()=>{$("bioOffer").classList.remove("on");lsSet("cerquita-bio-asked",true)});
 $("gGo").addEventListener("click",tryUnlock);$("gKey").addEventListener("keydown",e=>{if(e.key==="Enter")tryUnlock()});
 $("lockBtn").addEventListener("click",lock);
 if(!unlocked())lock();else document.body.classList.remove("locked");
+bioRefresh().then(st=>{if(document.body.classList.contains("locked")&&st.av&&st.en)bioLogin().catch(()=>{})});
 const VIEWS=["panel","aceptar","pago","avisos","entrega"];
 function route(){const h=location.hash.replace("#","");const v=VIEWS.includes(h)?h:"panel";document.body.dataset.view=v;
   document.querySelectorAll(".tnav a").forEach(a=>a.toggleAttribute("aria-current",a.dataset.v===v)||a.removeAttribute("aria-current"));
