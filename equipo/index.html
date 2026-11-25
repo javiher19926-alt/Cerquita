@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cerquita Equipo</title>
+<meta name="theme-color" content="#0E8A82">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cerquita Equipo">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: cálida y seria, como un familiar de confianza que también es ordenado
+   IDEA: el comprobante de entrega — cada pedido nace como un recibo verificado
+   PICTURE: el formulario mismo, con una tarjeta-comprobante viva que se llena mientras el cliente escribe
+   COLOUR and TYPE: azul confianza, verde verificado, coral familia sobre arena; Sora + Inter
+   LAYOUT: encabezado corto, formulario en una columna y comprobante al lado (abajo en el celular) */
+:root{color-scheme:light dark;
+--bg:light-dark(#F7F5F0,#0A1A30);--card:light-dark(#FFFFFF,#11264A);--ink:light-dark(#0B2545,#EEF2F6);
+--mute:light-dark(#4A5D75,#A9B8CB);--line:light-dark(#DCE4EC,#24406A);--navy:#0B2545;--teal:light-dark(#0E8A82,#3CC7BC);
+--coral:light-dark(#C9622A,#F08A4B);--field:light-dark(#FFFFFF,#0D2040)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:Sora,Inter,sans-serif;line-height:1.1;margin:0;text-wrap:balance}
+p{text-align:justify}
+.top{background:var(--navy);color:#F7F5F0;padding:20px max(5vw,16px)}
+.top .in{max-width:1240px;margin:auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-family:Sora,sans-serif;font-weight:700;font-size:28px;letter-spacing:-.5px}
+.top small{color:#7FD8CF;font-size:15px;margin-inline-start:auto}
+.hero{background:var(--navy);color:#F7F5F0;padding:8px max(5vw,16px) 40px}
+.hero .in{max-width:1240px;margin:auto}
+.hero h1{font-size:clamp(32px,5vw,50px);max-width:20ch}
+.hero p{max-width:62ch;color:#C9D3E0;margin:14px 0 0}
+.trust{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:20px;padding:0;list-style:none;color:#F7F5F0;font-size:15px}
+.trust li{display:flex;gap:8px;align-items:center}
+.trust svg{flex:none}
+.ordergrid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:32px;align-items:start}
+@media(max-width:900px){.ordergrid{grid-template-columns:minmax(0,1fr)}}
+form{display:flex;flex-direction:column;gap:24px}
+fieldset{border:1px solid var(--line);background:var(--card);border-radius:18px;padding:22px;margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px}
+@media(max-width:600px){fieldset{grid-template-columns:minmax(0,1fr);padding:18px}}
+legend{font-family:Sora,sans-serif;font-weight:700;font-size:20px;padding:0 6px}
+.full{grid-column:1/-1}
+label{display:flex;flex-direction:column;gap:6px;font-weight:500;font-size:15px}
+label .req{color:var(--coral)}
+.hint{font-size:13px;color:var(--mute);font-weight:400}
+input,select,textarea{font:16px Inter,sans-serif;color:var(--ink);background:var(--field);border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;min-height:46px;width:100%}
+textarea{min-height:84px;resize:vertical}
+input:focus,select:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;width:1px;height:1px}
+.chip span{display:inline-flex;align-items:center;min-height:44px;padding:8px 14px;border:1.5px solid var(--line);border-radius:999px;cursor:pointer;font-size:15px;background:var(--field)}
+.chip input:checked+span{background:var(--teal);border-color:var(--teal);color:#fff}
+.chip input:focus-visible+span{outline:3px solid var(--teal);outline-offset:2px}
+.items{display:flex;flex-direction:column;gap:10px}
+.item{border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px;background:light-dark(#FBFCFD,#0F2546)}
+.item .main{display:grid;grid-template-columns:minmax(0,1fr) 90px 44px;gap:8px}
+.item .num{font-size:13px;font-weight:600;color:var(--teal)}
+.det{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media(max-width:600px){.det{grid-template-columns:minmax(0,1fr)}}
+.det .f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:500;color:var(--mute)}
+.det .f .wrap{display:flex;gap:6px;align-items:center}
+.det .f input[type=text]{min-height:42px;padding:9px 10px;font-size:16px}
+.det .f input:disabled{opacity:.45}
+.na{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--mute);white-space:nowrap;cursor:pointer;min-height:42px}
+.na input{width:18px;height:18px;min-height:0;margin:0}
+.det .other{grid-column:1/-1}
+.icon-btn{min-width:44px;min-height:46px;border-radius:12px;border:1.5px solid var(--line);background:var(--field);color:var(--mute);cursor:pointer;font-size:20px}
+.btn{font:600 16px Inter,sans-serif;min-height:48px;padding:12px 20px;border-radius:12px;border:0;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.main{background:var(--teal);color:#fff}
+.btn.sec{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.warn{display:none;background:light-dark(#FDECEA,#4A1F1C);color:light-dark(#8A1C12,#FFD3CC);border-radius:12px;padding:12px 14px;font-size:15px}
+.warn.on{display:block}
+.check{flex-direction:row;align-items:flex-start;gap:10px;font-weight:400}
+.check input{width:22px;height:22px;min-height:0;margin-top:2px;flex:none}
+aside{position:sticky;top:20px}
+@media(max-width:900px){aside{position:static}}
+.receipt{background:var(--card);border-radius:22px;overflow:hidden;box-shadow:0 14px 40px rgba(11,37,69,.14);border:1px solid var(--line)}
+.receipt .hd{background:var(--teal);color:#fff;padding:16px 22px;display:flex;align-items:center;gap:10px;font-family:Sora,sans-serif;font-weight:700;font-size:18px}
+.receipt dl{margin:0;padding:18px 22px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:9px 14px;font-size:15px}
+.receipt dt{color:var(--mute)}
+.receipt dd{margin:0;text-align:right;font-weight:600;overflow-wrap:anywhere}
+.receipt .ft{padding:14px 22px;background:light-dark(#F7F5F0,#0D2040);font-size:14px;color:var(--mute)}
+.veh{display:inline-block;background:light-dark(#E3F5F3,#123F45);color:var(--teal);border-radius:999px;padding:2px 10px;font-weight:600}
+.done{display:none;margin-top:18px;background:var(--card);border:2px solid var(--teal);border-radius:18px;padding:20px}
+.done.on{display:block}
+.code{font-family:Sora,sans-serif;font-size:30px;font-weight:800;color:var(--teal);letter-spacing:1px}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.band{padding:clamp(28px,4vw,56px) max(5vw,16px);border-top:1px solid var(--line)}
+.band .in{max-width:1240px;margin:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+@media(max-width:800px){.band .in{grid-template-columns:minmax(0,1fr)}}
+.band h3{font-size:19px;margin-bottom:8px}
+.band p{margin:0;color:var(--mute)}
+footer{text-align:center;color:var(--mute);font-size:14px;padding:24px 16px 40px}
+.tl{padding:clamp(28px,4vw,52px) max(5vw,16px) 8px}
+.tl .in{max-width:1240px;margin:auto}
+.tl-head h2{font-size:clamp(28px,3.6vw,40px);margin-bottom:10px}
+.tl-head p{margin:0 0 20px;max-width:70ch;color:var(--mute)}
+.mine{display:none;background:var(--card);border:2px solid var(--teal);border-radius:16px;padding:14px 18px;margin-bottom:22px}
+.mine.on{display:block}
+.mine b{color:var(--teal)}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px 0}
+.step{position:relative;padding:0 14px 0 0}
+.step .dot{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 17px Sora,sans-serif;background:var(--card);border:2.5px solid var(--line);color:var(--mute);position:relative;z-index:1}
+.step::before{content:"";position:absolute;top:21px;left:44px;right:0;height:3px;background:var(--line)}
+.step:nth-child(3n)::before{display:none}
+.step h3{font-size:17px;margin:14px 0 6px}
+.step p{margin:0;font-size:14px;color:var(--mute)}
+.step .stage{margin-top:14px;font-size:13px;font-weight:600;color:var(--teal)}
+.step h3{margin-top:4px !important}
+.step p{text-align:justify;max-width:46ch}
+.step .meta{margin:12px 0 0;padding-top:10px;border-top:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr);gap:2px;font-size:13px}
+.step .meta dt{color:var(--mute);margin-top:6px}
+.step .meta dt:first-child{margin-top:0}
+.step .meta dd{margin:0;font-weight:600;color:var(--ink)}
+
+.step .tag{display:inline-block;margin-top:10px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px}
+.step.done .dot{background:var(--teal);border-color:var(--teal);color:#fff}
+.step.done::before{background:var(--teal)}
+.step.now .dot{border-color:var(--coral);color:var(--coral);box-shadow:0 0 0 5px light-dark(#FCE3D4,#4A2A18)}
+.step.now .tag{background:light-dark(#FCE3D4,#4A2A18);color:var(--coral)}
+.step.done .tag{background:light-dark(#E3F5F3,#123F45);color:var(--teal)}
+@media(max-width:900px){.steps{grid-template-columns:minmax(0,1fr)}
+  .step{padding:0 0 22px 62px}.step .dot{position:absolute;left:0;top:0}
+  .step::before{top:44px;bottom:0;left:20px;right:auto;width:3px;height:auto}
+  .step:nth-child(3n)::before{display:block}.step:last-child::before{display:none}
+  .step h3{margin-top:10px}}
+@media(prefers-reduced-motion:no-preference){.step.now .dot{animation:pulse 2s ease-in-out infinite}@keyframes pulse{50%{box-shadow:0 0 0 9px light-dark(#FCE3D4,#4A2A18)}}}
+.hero{padding-bottom:64px}
+.btn.ghost{background:transparent;color:#F7F5F0;border:1.5px solid rgba(247,245,240,.45)}
+.btn.ghost:hover{border-color:#7FD8CF;color:#7FD8CF}
+.menu{max-width:1120px;margin:-36px auto 0;padding:0 max(5vw,16px) 56px;position:relative;display:flex;flex-direction:column;gap:14px}
+.menu .mine{margin:0}
+details.acc{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 28px rgba(11,37,69,.08);overflow:hidden}
+details.acc>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:16px;padding:18px 22px;min-height:76px}
+details.acc>summary::-webkit-details-marker{display:none}
+details.acc>summary:hover{background:light-dark(#F7F9FB,#14305A)}
+details.acc>summary:focus-visible{outline:3px solid var(--teal);outline-offset:-3px}
+details[open].acc>summary{border-bottom:1px solid var(--line)}
+.acc .ic{width:48px;height:48px;border-radius:12px;background:#0B2545;display:flex;align-items:center;justify-content:center;flex:none}
+.acc .ic.hl{background:#13A89E}
+.acc .tx{display:flex;flex-direction:column;gap:2px}
+.acc .tt{font:700 19px/1.2 Sora,sans-serif}
+.acc .ss{font-size:14px;color:var(--mute)}
+.acc .chev{margin-inline-start:auto;flex:none;color:var(--mute);transition:transform .25s}
+details[open].acc .chev{transform:rotate(180deg)}
+.acc .panel{padding:24px 22px}
+@media(max-width:600px){.acc .panel{padding:18px 14px}.acc .tt{font-size:17px}}
+.acc .lead{margin:0 0 18px;color:var(--mute);max-width:75ch}
+.acc .tb-head p{margin:0 0 14px;max-width:none}
+.acc .pillars{margin-top:8px}
+.svc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+@media(max-width:800px){.svc{grid-template-columns:minmax(0,1fr)}}
+.svc h3{font-size:18px;margin-bottom:8px}.svc p{margin:0;color:var(--mute)}
+.stepper{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:16px}
+@media(max-width:700px){.stepper{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.sbtn{font:600 14px Inter,sans-serif;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 6px;border:1.5px solid var(--line);border-radius:12px;background:var(--field);color:var(--ink);cursor:pointer;min-height:44px;text-align:center}
+.sbtn:hover{border-color:var(--teal)}
+.sbtn .n{width:36px;height:36px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font:700 15px Sora,sans-serif;color:var(--mute)}
+.sbtn[aria-selected=true]{border-color:var(--teal);background:light-dark(#E3F5F3,#123F45)}
+.sbtn.done .n{background:var(--teal);border-color:var(--teal);color:#fff}
+.sbtn.now .n{border-color:var(--coral);color:var(--coral)}
+.sdetail{border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+.sdetail .stage{font-size:13px;font-weight:600;color:var(--teal)}
+.sdetail h3{font-size:22px;margin:6px 0 8px}
+.sdetail p{margin:0 0 16px;max-width:75ch}
+.sdetail dl{margin:0;padding-top:14px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 20px;font-size:14px}
+@media(max-width:600px){.sdetail dl{grid-template-columns:minmax(0,1fr)}}
+.sdetail dt{color:var(--mute)}.sdetail dd{margin:2px 0 0;font-weight:600}
+.sdetail .st{display:inline-block;margin-left:6px;padding:2px 10px;border-radius:999px;font-size:12px;background:light-dark(#FCE3D4,#4A2A18);color:var(--coral)}
+.sdetail .st.ok{background:light-dark(#E3F5F3,#123F45);color:var(--teal)}
+.trustband{background:var(--card);border-top:1px solid var(--line);padding:clamp(32px,5vw,64px) max(5vw,16px)}
+.trustband .in{max-width:1240px;margin:auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:40px;align-items:start}
+@media(max-width:900px){.trustband .in{grid-template-columns:minmax(0,1fr)}}
+.tb-head h2{font-size:clamp(30px,4vw,44px);color:var(--teal);margin-bottom:14px}
+.tb-head p{margin:0 0 14px;max-width:62ch}
+.pillars{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 28px}
+@media(max-width:600px){.pillars{grid-template-columns:minmax(0,1fr)}}
+.pillars li{padding-top:14px;border-top:2px solid var(--teal)}
+.pillars h3{font-size:18px;margin-bottom:6px}
+.pillars p{margin:0;color:var(--mute);font-size:15px}
+.hgrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:32px;align-items:center}
+@media(max-width:800px){.hgrid{grid-template-columns:minmax(0,1fr)}}
+.art{margin:0}.art svg{width:100%;height:auto;display:block}
+body[data-view=entrega] .vp,body[data-view=aceptar] .vp,body[data-view=panel] .vp{display:none}
+#vPanel{display:none;max-width:1000px;margin:auto;padding:32px max(5vw,16px) 64px}
+body[data-view=panel] #vPanel{display:block}
+body[data-view=pago] .vp{display:none}
+#vPago{display:none;max-width:860px;margin:auto;padding:32px max(5vw,16px) 64px}
+body[data-view=pago] #vPago{display:block}
+#vPago form{margin-top:20px}
+.vwrap{display:flex;justify-content:center;margin-top:24px}
+.voucher{width:340px;background:#fff;color:#0B2545;font:14px/1.45 Inter,sans-serif;padding:26px 22px 30px;position:relative;box-shadow:0 14px 40px rgba(11,37,69,.16);
+  -webkit-mask:radial-gradient(circle 7px at 50% 0,#0000 98%,#000) 50% 0/18px 100% repeat-x,linear-gradient(#000,#000) 0 7px/100% calc(100% - 14px) no-repeat,radial-gradient(circle 7px at 50% 100%,#0000 98%,#000) 50% 100%/18px 100% repeat-x;
+  mask:radial-gradient(circle 7px at 50% 0,#0000 98%,#000) 50% 0/18px 100% repeat-x,linear-gradient(#000,#000) 0 7px/100% calc(100% - 14px) no-repeat,radial-gradient(circle 7px at 50% 100%,#0000 98%,#000) 50% 100%/18px 100% repeat-x}
+.voucher .vh{text-align:center}
+.voucher .vh .bn{font:700 24px Sora,sans-serif;letter-spacing:-.5px}
+.voucher .vh small{display:block;color:#4A5D75;font-size:12px}
+.voucher .vt{margin:14px 0 4px;text-align:center;font:700 13px Sora,sans-serif;letter-spacing:.5px}
+.voucher hr{border:0;border-top:1.5px dashed #B4C1D1;margin:14px 0}
+.voucher .ln{display:flex;justify-content:space-between;gap:12px;margin:5px 0}
+.voucher .ln span:first-child{color:#4A5D75}
+.voucher .ln span:last-child{text-align:right;font-weight:600;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.voucher .amt{text-align:center;margin:6px 0}
+.voucher .amt b{display:block;font:800 30px Sora,sans-serif;font-variant-numeric:tabular-nums}
+.voucher .amt small{color:#4A5D75;font-size:12px}
+.voucher .ok{display:flex;align-items:center;justify-content:center;gap:8px;color:#0E8A82;font:700 15px Sora,sans-serif;margin:10px 0}
+.voucher .code{text-align:center;font:600 13px/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:2px;margin-top:6px}
+.voucher .bars{display:block;margin:10px auto 0}
+.voucher .fine{font-size:11px;color:#4A5D75;text-align:justify;margin-top:12px}
+.pbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:18px 0}
+.pbar .grow{flex:1 1 auto}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+.seg button{font:600 14px Inter,sans-serif;min-height:44px;padding:8px 14px;border:0;background:var(--field);color:var(--ink);cursor:pointer}
+.seg button[aria-pressed=true]{background:#0B2545;color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.kpi b{display:block;font:800 30px Sora,sans-serif}.kpi span{font-size:13px;color:var(--mute)}
+.kpi.new b{color:var(--coral)}
+.ocard{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden}
+.ocard.isnew{border:2px solid var(--coral)}
+.ocard>summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:14px 18px;min-height:56px}
+.ocard>summary::-webkit-details-marker{display:none}
+.ocard .oc{font:700 17px Sora,sans-serif}
+.ocard .who{color:var(--mute);font-size:14px;flex:1 1 220px}
+.chipst{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:light-dark(#E8EDF3,#1D3A63);color:var(--ink)}
+.chipst.Solicitud{background:light-dark(#FCE3D4,#4A2A18);color:var(--coral)}
+.chipst.Entregado{background:light-dark(#E3F5F3,#123F45);color:var(--teal)}
+.chipst.Cancelado{background:light-dark(#EEE,#333);color:var(--mute)}
+.nbadge{font-size:11px;font-weight:800;background:var(--coral);color:#fff;border-radius:999px;padding:2px 8px}
+.obody{padding:4px 18px 18px;border-top:1px solid var(--line)}
+.obody dl{display:grid;grid-template-columns:160px minmax(0,1fr);gap:8px 14px;margin:14px 0;font-size:15px}
+@media(max-width:600px){.obody dl{grid-template-columns:minmax(0,1fr)}.obody dt{margin-top:6px}}
+.obody dt{color:var(--mute)}.obody dd{margin:0;white-space:pre-line;overflow-wrap:anywhere}
+.oact{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.oact select{width:auto;min-width:170px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:50;background:#0B2545;color:#fff;border-radius:14px;padding:14px 18px;box-shadow:0 10px 30px rgba(0,0,0,.3);display:none;align-items:center;gap:12px;max-width:calc(100vw - 24px)}
+.toast.on{display:flex}
+.toast a{color:#7FD8CF;font-weight:700}
+#vAceptar{display:none;max-width:820px;margin:auto;padding:32px max(5vw,16px) 64px}
+body[data-view=aceptar] #vAceptar{display:block}
+#vAvisos{display:none}body[data-view=aceptar] #vAvisos{display:block}
+#vAceptar form{margin-top:20px}
+.doc{background:#FFFFFF;color:#0B2545;border:1px solid #DCE4EC;border-radius:6px;box-shadow:0 14px 40px rgba(11,37,69,.14);overflow:hidden;margin-top:24px;position:relative}
+.doc .dh{background:#0B2545;color:#F7F5F0;padding:22px 28px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.doc .dh .bn{font-family:Sora,sans-serif;font-weight:700;font-size:26px;letter-spacing:-.5px}
+.doc .dh .meta{margin-inline-start:auto;text-align:right;font-size:13px;color:#C9D3E0;line-height:1.4}
+.doc .dh .meta b{color:#7FD8CF;font-size:15px}
+.doc .db{padding:26px 28px}
+.doc h3{font-size:20px;margin:0 0 4px;letter-spacing:.2px}
+.doc .sub{color:#4A5D75;font-size:14px;margin:0 0 18px}
+.doc table{width:100%;border-collapse:collapse;font-size:15px;margin-bottom:18px}
+.ksum{background:var(--card);border:2px solid var(--teal);border-radius:18px;padding:18px 22px;display:none}
+.ksum.on{display:block}
+.ksum .kh{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:6px}
+.ksum .kh b{font:700 18px Sora,sans-serif}
+.ksum .kh .okc{font-size:14px}
+.ksum dl{display:grid;grid-template-columns:170px minmax(0,1fr);gap:6px 14px;margin:10px 0 0;font-size:15px}
+@media(max-width:600px){.ksum dl{grid-template-columns:minmax(0,1fr)}.ksum dt{margin-top:6px}}
+.ksum dt{color:var(--mute)}.ksum dd{margin:0;white-space:pre-line;overflow-wrap:anywhere;font-weight:500}
+.doc h4{font:700 13px Sora,sans-serif;letter-spacing:.4px;color:#0E8A82;margin:18px 0 2px;padding-bottom:6px;border-bottom:2px solid #0B2545}
+.doc .neg{color:#B3261E}
+.doc td{padding:8px 0;border-bottom:1px solid #E6EBF1;vertical-align:top}
+.doc td:first-child{color:#4A5D75;width:40%;padding-right:12px}
+.doc td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.doc tr.tot td{font-weight:700;font-size:17px;border-bottom:2px solid #0B2545}
+.doc ol{margin:0 0 20px;padding-left:20px;font-size:14px;line-height:1.6}
+.doc ol li{text-align:justify;margin-bottom:6px}
+.doc .ts{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end;justify-content:space-between;border-top:1px solid #E6EBF1;padding-top:18px}
+.doc .sigb{min-width:220px;flex:1 1 240px}
+.doc .sigb img{height:90px;max-width:100%;object-fit:contain;display:block}
+.doc .sigb .ln{border-top:1.5px solid #0B2545;padding-top:6px;font-size:14px}
+.doc .stamp{width:132px;height:132px;border:4px double #0E8A82;border-radius:50%;color:#0E8A82;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;transform:rotate(-12deg);font-family:Sora,sans-serif;font-weight:800;font-size:17px;line-height:1.1;flex:none}
+.doc .stamp small{font:600 10px Inter,sans-serif;margin-top:4px}
+.doc .clock{background:#F2F5F8;border-radius:6px;padding:12px 14px;font-size:14px;margin-bottom:18px}
+.doc .clock b{font-family:Sora,sans-serif;font-size:18px;font-variant-numeric:tabular-nums}
+.doc .df{background:#F7F5F0;padding:12px 28px;font-size:12px;color:#4A5D75;text-align:justify}
+#vEntrega{display:none;max-width:760px;margin:auto;padding:32px max(5vw,16px) 64px}
+body[data-view=entrega] #vEntrega{display:block}
+#vEntrega form{margin-top:20px}
+.sig{width:100%;height:180px;border:1.5px dashed var(--line);border-radius:12px;background:#fff;touch-action:none;display:block;cursor:crosshair}
+.stars{display:flex;flex-direction:row-reverse;justify-content:flex-end;gap:4px;position:relative}
+.stars input{position:absolute;opacity:0;width:1px;height:1px}
+.stars label{font-size:40px;line-height:1;color:var(--line);cursor:pointer;min-width:48px;min-height:48px;display:flex;align-items:center;justify-content:center}
+.stars input:checked~label,.stars label:hover,.stars label:hover~label{color:#F5B301}
+.stars input:focus-visible+label{outline:3px solid var(--teal);border-radius:8px}
+.okc{color:var(--teal);font-weight:600}.badc{color:light-dark(#B3261E,#FF8A80);font-weight:600}
+.proof{margin-top:24px}
+.proof .photo{width:100%;max-height:280px;object-fit:cover;display:block}
+.proof .sigimg{width:100%;max-height:120px;object-fit:contain;background:#fff;border-radius:10px;display:block}
+.proof .starsv{color:#F5B301;letter-spacing:2px}
+.staff{color:var(--mute);text-decoration:underline}
+@media(prefers-reduced-motion:no-preference){.done.on{animation:pop .4s ease-out}@keyframes pop{from{transform:translateY(8px);opacity:0}}}
+
+.top{padding-top:max(20px,env(safe-area-inset-top))}
+.instbtn{display:none;font:600 14px Inter,sans-serif;min-height:40px;padding:8px 14px;border-radius:999px;border:1.5px solid rgba(247,245,240,.5);background:transparent;color:#F7F5F0;cursor:pointer}
+.instbtn.on{display:inline-flex}
+.modal{position:fixed;inset:0;background:rgba(11,37,69,.55);display:none;align-items:flex-end;justify-content:center;z-index:60;padding:16px}
+.modal.on{display:flex}
+.modal .box{background:var(--card);color:var(--ink);border-radius:18px;max-width:420px;width:100%;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.modal ol{padding-left:20px;margin:10px 0 16px}
+footer{padding-bottom:max(40px,env(safe-area-inset-bottom))}
+
+.top .eq{font:700 12px Inter,sans-serif;background:#13A89E;color:#fff;border-radius:999px;padding:3px 10px;margin-inline-end:auto}
+.tnav{display:flex;gap:4px;overflow-x:auto;max-width:1240px;margin:14px auto 0;padding:0 0 2px;scrollbar-width:none}
+.tnav a{flex:none;color:#C9D3E0;text-decoration:none;font:600 15px Inter,sans-serif;padding:10px 16px;border-radius:10px 10px 0 0;min-height:44px;display:inline-flex;align-items:center;gap:6px}
+.tnav a[aria-current=page]{background:var(--bg);color:var(--ink)}
+.tnav .nb:empty{display:none}.tnav .nb{background:#F08A4B;color:#fff;border-radius:999px;font-size:11px;padding:1px 7px}
+.top{padding-bottom:0}
+#vAvisos{display:none;max-width:820px;margin:auto;padding:32px max(5vw,16px) 64px}
+body[data-view=avisos] #vAvisos{display:block}
+body[data-view=aceptar] #vAvisos{display:none}
+#gate{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px}
+.gbox{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:32px 26px;max-width:380px;width:100%;display:flex;flex-direction:column;align-items:center;box-shadow:0 14px 40px rgba(11,37,69,.12)}
+body.locked > *:not(#gate):not(script){display:none !important}
+body.locked #gate{display:flex}
+</style>
+</head>
+<body class="locked">
+<header class="top"><div class="in">
+  <svg width="40" height="40" viewBox="0 0 120 120" aria-hidden="true"><path d="M88.3 26.3 A44 44 0 1 0 88.3 93.7" fill="none" stroke="#F7F5F0" stroke-width="15" stroke-linecap="round"/><circle cx="88.3" cy="26.3" r="10" fill="#13A89E"/><path d="M60 76 C 45 65, 42 55, 49 49 C 54 45, 60 48, 60 53 C 60 48, 66 45, 71 49 C 78 55, 75 65, 60 76 Z" fill="#F08A4B"/></svg>
+  <span class="brand">cerquita</span><span class="eq">Equipo</span>
+  <button type="button" class="instbtn" id="instBtn">Instalar app</button>
+  <button type="button" class="instbtn on" id="lockBtn">Cerrar sesión</button>
+</div>
+<nav class="tnav" aria-label="Secciones del equipo">
+  <a href="#panel" data-v="panel">Pedidos <span class="nb" id="navNew"></span></a><a href="#aceptar" data-v="aceptar">Aceptar</a><a href="#pago" data-v="pago">Pago</a><a href="#avisos" data-v="avisos">Avisos</a><a href="#entrega" data-v="entrega">Entrega</a>
+</nav></header>
+<section id="gate"><div class="gbox">
+  <svg width="72" height="72" viewBox="0 0 120 120" aria-hidden="true"><path d="M88.3 26.3 A44 44 0 1 0 88.3 93.7" fill="none" stroke="#0B2545" stroke-width="15" stroke-linecap="round"/><circle cx="88.3" cy="26.3" r="10" fill="#13A89E"/><path d="M60 76 C 45 65, 42 55, 49 49 C 54 45, 60 48, 60 53 C 60 48, 66 45, 71 49 C 78 55, 75 65, 60 76 Z" fill="#F08A4B"/></svg>
+  <h1 style="font-size:30px;margin:10px 0 4px">Cerquita Equipo</h1>
+  <p style="color:var(--mute);margin:0 0 18px;text-align:center">Acceso exclusivo para el personal de Cerquita.</p>
+  <label style="width:100%"><span>Clave del equipo</span><input id="gKey" type="password" autocomplete="current-password"></label>
+  <button type="button" class="btn main" id="gGo" style="width:100%;margin-top:12px">Entrar</button>
+  <p class="badc" id="gMsg" style="margin:10px 0 0;min-height:1.5em" aria-live="assertive"></p>
+</div></section>
+<section id="vEntrega">
+  
+  <h2 style="font-size:clamp(28px,4vw,40px);margin:14px 0 8px">Registrar entrega</h2>
+  <p style="color:var(--mute);margin:0">Para el equipo de Cerquita, en la puerta del familiar. Llenalo junto con la persona que recibe y, al final, mandale el comprobante al cliente.</p>
+  <form id="g" novalidate>
+    <fieldset>
+      <legend>Verificación</legend>
+      <label><span>Número de pedido <span class="req">*</span></span><input id="dCode" placeholder="CQ-261125-1234" autocapitalize="characters"></label>
+      <label><span>WhatsApp del cliente <span class="hint">(para enviarle el PDF)</span></span><input id="dWa" type="tel" inputmode="tel" placeholder="+506 8888 8888"></label>
+      <label><span>PIN del pedido <span class="hint">(viene en el WhatsApp)</span></span><input id="dPinA" inputmode="numeric" maxlength="4"></label>
+      <label><span>PIN que dijo el familiar <span class="req">*</span></span><input id="dPinB" inputmode="numeric" maxlength="4"></label>
+      <div class="full" id="pinMsg" aria-live="polite"></div>
+    </fieldset>
+    <fieldset>
+      <legend>Foto de la entrega</legend>
+      <label class="full"><span>Foto del familiar con el pedido <span class="hint">(recomendado)</span></span><input id="dPhoto" type="file" accept="image/*"></label>
+      <img id="dPrev" alt="Vista previa de la foto de entrega" style="display:none;width:100%;max-height:240px;object-fit:cover;border-radius:12px" class="full">
+    </fieldset>
+    <fieldset>
+      <legend>Recibí conforme</legend>
+      <label><span>Nombre de quien recibe <span class="req">*</span></span><input id="dName" autocomplete="off"></label>
+      <label><span>Cédula <span class="req">*</span></span><input id="dCed" placeholder="001-010180-0001A" autocapitalize="characters" autocomplete="off"></label>
+      <div class="full" style="display:flex;flex-direction:column;gap:6px">
+        <span style="font-weight:500;font-size:15px" id="sigLbl">Firma <span class="req">*</span> <span class="hint">— firmá con el dedo dentro del recuadro</span></span>
+        <canvas id="sig" class="sig" aria-labelledby="sigLbl"></canvas>
+        <div><button type="button" class="btn sec" id="sigClear">Borrar firma</button></div>
+      </div>
+      <label class="full check"><input type="checkbox" id="dOk"> Recibí el pedido completo y en buen estado.</label>
+    </fieldset>
+    <fieldset>
+      <legend>¿Cómo te atendimos?</legend>
+      <div class="full stars" role="radiogroup" aria-label="Calificación de 1 a 5 estrellas">
+        <input type="radio" name="rate" id="r5" value="5"><label for="r5" aria-label="5 estrellas">★</label>
+        <input type="radio" name="rate" id="r4" value="4"><label for="r4" aria-label="4 estrellas">★</label>
+        <input type="radio" name="rate" id="r3" value="3"><label for="r3" aria-label="3 estrellas">★</label>
+        <input type="radio" name="rate" id="r2" value="2"><label for="r2" aria-label="2 estrellas">★</label>
+        <input type="radio" name="rate" id="r1" value="1"><label for="r1" aria-label="1 estrella">★</label>
+      </div>
+      <label class="full"><span>Comentario <span class="hint">(opcional)</span></span><textarea id="dCom" placeholder="Ej.: Muy amables, llegaron puntuales."></textarea></label>
+      <div class="full badc" id="gErr" aria-live="assertive"></div>
+      <div class="full row" style="margin:0"><button type="submit" class="btn main">Generar comprobante</button></div>
+    </fieldset>
+  </form>
+  <div id="proofWrap" style="display:none">
+    <div class="receipt proof" id="proof"></div>
+    <div class="row">
+      <button type="button" class="btn main" id="pCopy"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 14h6M9 17h4"/></svg>Enviar PDF por WhatsApp</button>
+      <button type="button" class="btn sec" id="pDown">Descargar PDF</button>
+      <button type="button" class="btn sec" id="pNew">Nueva entrega</button>
+    </div>
+    <p class="hint" id="pMsg" style="margin:10px 0 0">El comprobante se envía en PDF. Al presionar el botón, elegí WhatsApp y el chat del cliente.</p>
+  </div>
+</section>
+<section id="vAceptar">
+  
+  <h2 style="font-size:clamp(28px,4vw,40px);margin:14px 0 8px">Aceptación formal de pedido</h2>
+  <p style="color:var(--mute);margin:0">Para uso de Cerquita. Pegá el pedido que llegó por WhatsApp, completá la cotización y firmá. La fecha, la hora y los segundos se registran en el momento exacto en que presionás «Aceptar pedido».</p>
+  <form id="h" novalidate>
+    <fieldset>
+      <legend>Pedido recibido</legend>
+      <label class="full"><span>Pegá aquí el mensaje del pedido <span class="hint">(llena los datos automáticamente)</span></span><textarea id="aRaw" placeholder="*Nuevo pedido Cerquita CQ-…*"></textarea></label>
+      <label><span>Número de pedido <span class="req">*</span></span><input id="aCode" autocapitalize="characters"></label>
+      <label><span>Cliente <span class="req">*</span></span><input id="aClient"></label>
+      <label><span>WhatsApp del cliente <span class="hint">(para enviarle el PDF)</span></span><input id="aWa" type="tel" inputmode="tel"></label>
+      <label>País del cliente<input id="aCountry"></label>
+      <label><span>Beneficiario en Managua <span class="req">*</span></span><input id="aBenef"></label>
+      <label class="full"><span>Descripción del encargo <span class="req">*</span></span><textarea id="aDesc"></textarea></label>
+    </fieldset>
+    <fieldset>
+      <legend>Cotización</legend>
+      <label>Moneda<select id="aCur"><option value="C$">Córdobas (C$)</option><option value="US$">Dólares (US$)</option></select></label>
+      <label>Vigencia de la cotización<select id="aValid"><option value="24">24 horas</option><option value="48">48 horas</option><option value="12">12 horas</option></select></label>
+      <label><span>Productos <span class="req">*</span></span><input id="aProd" inputmode="decimal" placeholder="0.00"></label>
+      <label>Costo de entrega<input id="aShip" inputmode="decimal" placeholder="0.00"></label>
+      <label>Tarifa de servicio<input id="aFee" inputmode="decimal" placeholder="0.00"></label>
+      <label>Fecha estimada de entrega<input id="aDate" type="date"></label>
+      <div class="full" style="font-family:Sora,sans-serif;font-size:22px;font-weight:700">Total: <span id="aTotal">0.00</span></div>
+      <label class="full"><span>Datos para la transferencia <span class="hint">(opcional; banco, titular y cuenta)</span></span><textarea id="aBank"></textarea></label>
+    </fieldset>
+    <fieldset>
+      <legend>Responsable de la aceptación</legend>
+      <label><span>Nombre completo <span class="req">*</span></span><input id="aName" autocomplete="name"></label>
+      <label><span>Cargo <span class="req">*</span></span><input id="aRole" value="Gerente de Operaciones"></label>
+      <div class="full" style="display:flex;flex-direction:column;gap:6px">
+        <span style="font-weight:500;font-size:15px" id="aSigLbl">Firma del responsable <span class="req">*</span></span>
+        <canvas id="aSig" class="sig" aria-labelledby="aSigLbl"></canvas>
+        <div><button type="button" class="btn sec" id="aSigClear">Borrar firma</button></div>
+      </div>
+      <div class="full badc" id="hErr" aria-live="assertive"></div>
+      <div class="full row" style="margin:0"><button type="submit" class="btn main">Aceptar pedido</button></div>
+    </fieldset>
+  </form>
+  <div id="docWrap" style="display:none">
+    <article class="doc" id="doc"></article>
+    <div class="row">
+      <button type="button" class="btn main" id="dCopy"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 14h6M9 17h4"/></svg>Enviar PDF por WhatsApp</button>
+      <button type="button" class="btn sec" id="dDown">Descargar PDF</button>
+      <button type="button" class="btn sec" id="dNew">Aceptar otro pedido</button>
+    </div>
+    <p class="hint" id="dMsg" style="margin:10px 0 0">La constancia se envía en PDF. Al presionar el botón, elegí WhatsApp y el chat del cliente.</p>
+  </div>
+</section>
+<section id="vAvisos">
+  <h2 style="font-size:clamp(28px,4vw,40px);margin:0 0 8px">Avisos de seguimiento</h2>
+  <fieldset>
+    <legend>Avisos de seguimiento (pasos 3, 4 y 5)</legend>
+    <p class="full hint" style="margin:0">Prepará el mensaje del paso en que va el pedido y pegalo en el WhatsApp del cliente.</p>
+    <label>Número de pedido<input id="uCode" autocapitalize="characters" placeholder="CQ-261125-1234"></label>
+    <label>Paso<select id="uStep"><option value="3">3 · Pago confirmado</option><option value="4">4 · Compras en proceso</option><option value="5">5 · En camino</option></select></label>
+    <label><span>Vehículo <span class="hint">(paso 5)</span></span><select id="uVeh"><option>Moto</option><option>Carro</option><option>Pickup</option></select></label>
+    <label><span>Hora estimada de llegada <span class="hint">(paso 5)</span></span><input id="uEta" type="time"></label>
+    <div class="full row" style="margin:0"><button type="button" class="btn main" id="uCopy">Copiar aviso</button><a class="btn sec" href="#pago" id="uPay">Emitir recibo oficial de pago</a></div>
+    <pre class="full" id="uOut" style="white-space:pre-wrap;margin:0;font:14px/1.5 Inter,sans-serif;color:var(--mute)"></pre>
+  </fieldset>
+</section>
+<section id="vPago">
+  
+  <h2 style="font-size:clamp(28px,4vw,40px);margin:14px 0 8px">Recibo oficial de pago</h2>
+  <p style="color:var(--mute);margin:0">Etapa 3 del proceso. Registrá los datos de la transferencia recibida y la plataforma genera el recibo oficial en formato carta y el voucher electrónico en formato ticket, ambos con fecha, hora y segundos de emisión.</p>
+  <form id="k" novalidate>
+    <div id="kSum" class="ksum" aria-live="polite"></div>
+    <div id="kKnown">
+    <fieldset>
+      <legend>Datos del pedido</legend>
+      <label id="kCodeLbl"><span>Número de pedido <span class="req">*</span></span><input id="kCode" autocapitalize="characters" placeholder="CQ-261125-1234" autocomplete="off"></label>
+      <div class="full" id="kLook" aria-live="polite"></div>
+      <label><span>Cliente que realizó el pago <span class="req">*</span></span><input id="kClient"></label>
+      <label><span>WhatsApp del cliente <span class="hint">(para enviarle el PDF)</span></span><input id="kWa" type="tel" inputmode="tel"></label>
+      <label>Concepto<input id="kConcept" placeholder="Pago del pedido"></label>
+    </fieldset>
+    <fieldset>
+      <legend>Datos del cliente y del pedido</legend>
+      <p class="full hint" style="margin:0">Se llenan solos si el pedido viene del Panel o fue aceptado en este dispositivo. Podés completarlos o corregirlos.</p>
+      <label>País del cliente<input id="kCountry"></label>
+      <label>Correo del cliente<input id="kMail" type="email"></label>
+      <label>Beneficiario en Managua<input id="kBenef"></label>
+      <label>Parentesco<input id="kRel"></label>
+      <label>Teléfono del beneficiario<input id="kBTel" type="tel" inputmode="tel"></label>
+      <label>Zona<input id="kZone" placeholder="Barrio, distrito"></label>
+      <label class="full">Dirección de entrega<input id="kAddr"></label>
+      <label class="full">Detalle del pedido<textarea id="kDesc"></textarea></label>
+      <label>Total cotizado<input id="kQuoted" inputmode="decimal" placeholder="0.00"></label>
+      <label>Fecha de aceptación<input id="kAccepted" placeholder="25 de noviembre de 2026 15:55:32"></label>
+      <label>Fecha estimada de entrega<input id="kDeliv" placeholder="Por confirmar"></label>
+      <label>Vehículo asignado<input id="kVeh"></label>
+    </fieldset>
+    </div>
+    <fieldset>
+      <legend>Datos de la transferencia</legend>
+      <label>Moneda<select id="kCur"><option value="C$">Córdobas (C$)</option><option value="US$">Dólares (US$)</option></select></label>
+      <label><span>Monto recibido <span class="req">*</span></span><input id="kAmt" inputmode="decimal" placeholder="0.00"></label>
+      <label><span>Banco de origen <span class="req">*</span></span><input id="kBank" placeholder="Banco desde donde se transfirió"></label>
+      <label><span>N.º de referencia o transacción <span class="req">*</span></span><input id="kRef" autocomplete="off"></label>
+      <label><span>Fecha y hora de la transferencia <span class="req">*</span></span><input id="kWhen" type="datetime-local"></label>
+      <label><span>Cuenta de destino <span class="hint">(solo últimos 4 dígitos)</span></span><input id="kAcct" inputmode="numeric" maxlength="4" placeholder="1234"></label>
+    </fieldset>
+    <fieldset>
+      <legend>Responsable de la confirmación</legend>
+      <label><span>Nombre completo <span class="req">*</span></span><input id="kName" autocomplete="name"></label>
+      <label><span>Cargo <span class="req">*</span></span><input id="kRole" value="Gerente de Operaciones"></label>
+      <div class="full" style="display:flex;flex-direction:column;gap:6px">
+        <span style="font-weight:500;font-size:15px" id="kSigLbl">Firma del responsable <span class="req">*</span></span>
+        <canvas id="kSig" class="sig" aria-labelledby="kSigLbl"></canvas>
+        <div><button type="button" class="btn sec" id="kSigClear">Borrar firma</button></div>
+      </div>
+      <div class="full badc" id="kErr" aria-live="assertive"></div>
+      <div class="full row" style="margin:0"><button type="submit" class="btn main">Confirmar pago y emitir recibo</button></div>
+    </fieldset>
+  </form>
+  <div id="kOut" style="display:none">
+    <h3 style="font-size:22px;margin:28px 0 0">Recibo oficial</h3>
+    <article class="doc" id="rDoc"></article>
+    <div class="row">
+      <button type="button" class="btn main" id="rSend"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 14h6M9 17h4"/></svg>Enviar PDF por WhatsApp</button>
+      <button type="button" class="btn sec" id="rDown">Descargar PDF</button>
+    </div>
+    <p class="hint" id="rMsg" style="margin:10px 0 0" aria-live="polite"></p>
+    <h3 style="font-size:22px;margin:36px 0 0">Voucher electrónico</h3>
+    <div class="vwrap"><div class="voucher" id="vDoc"></div></div>
+    <div class="row" style="justify-content:center">
+      <button type="button" class="btn main" id="vSend"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 14h6M9 17h4"/></svg>Enviar PDF por WhatsApp</button>
+      <button type="button" class="btn sec" id="vDown">Descargar PDF</button>
+    </div>
+    <p class="hint" id="vMsg" style="margin:10px 0 0;text-align:center" aria-live="polite"></p>
+    <div class="row" style="justify-content:center;margin-top:24px"><button type="button" class="btn sec" id="kNew">Registrar otro pago</button></div>
+  </div>
+</section>
+<section id="vPanel">
+  
+  <h2 style="font-size:clamp(28px,4vw,40px);margin:14px 0 6px">Panel de pedidos</h2>
+  <p style="color:var(--mute);margin:0">Pedidos registrados en la hoja «Pedidos Cerquita». Se actualiza solo cada 30 segundos y te avisa cuando entra un pedido nuevo.</p>
+  <div id="pLogin" style="margin-top:20px">
+    <fieldset>
+      <legend>Acceso del equipo</legend>
+      <label class="full">Clave del panel<input id="pKeyIn" type="password" autocomplete="current-password"></label>
+      <div class="full row" style="margin:0"><button type="button" class="btn main" id="pEnter">Entrar</button></div>
+      <p class="full hint" id="pLoginMsg" style="margin:0"></p>
+    </fieldset>
+  </div>
+  <div id="pMain" style="display:none">
+    <div class="kpis">
+      <div class="kpi new"><b id="kNew">0</b><span>Nuevos por aceptar</span></div>
+      <div class="kpi"><b id="kAct">0</b><span>En proceso</span></div>
+      <div class="kpi"><b id="kDone">0</b><span>Entregados</span></div>
+    </div>
+    <div class="pbar">
+      <div class="seg" role="group" aria-label="Filtrar pedidos">
+        <button type="button" data-f="nuevos" aria-pressed="true">Nuevos</button>
+        <button type="button" data-f="activos" aria-pressed="false">En proceso</button>
+        <button type="button" data-f="todos" aria-pressed="false">Todos</button>
+      </div>
+      <span class="grow"></span>
+      <button type="button" class="btn sec" id="pRefresh">Actualizar</button>
+      <button type="button" class="btn sec" id="pAlerts">Activar alertas</button>
+      <button type="button" class="btn sec" id="pOut">Salir</button>
+    </div>
+    <p class="hint" id="pStatus" aria-live="polite" style="margin:0 0 12px"></p>
+    <div id="pList"></div>
+  </div>
+</section>
+<div class="toast" id="toast" role="status"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7FD8CF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><span id="toastTx"></span><a href="#panel" id="toastGo">Ver</a></div>
+<footer>cerquita · Equipo · Uso interno</footer>
+<script>
+{
+const WA_NUMBER = "50587072125";
+const API_URL = ""; // Pegá aquí la URL de la aplicación web de Google Apps Script (termina en /exec)
+const TEAM_HASH = "f5c21146f57ee06e012c7df00cd15c47ee0b47451149e2d105ae02fae233652e";
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+/* ---------- Registro de entrega ---------- */
+const cv=$("sig"),ctx=cv.getContext("2d");let drawing=false,signed=false,photoURL="",proofText="";
+function sizeCv(){const r=cv.getBoundingClientRect();if(!r.width)return;const d=window.devicePixelRatio||1;
+  cv.width=Math.round(r.width*d);cv.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0);
+  ctx.lineWidth=4;ctx.lineCap="round";ctx.lineJoin="round";ctx.strokeStyle="#1546D8";signed=false}
+const sigObs=new ResizeObserver(()=>{if(!signed)sizeCv()});sigObs.observe(cv);
+cv.addEventListener("pointerdown",e=>{drawing=true;try{cv.setPointerCapture(e.pointerId)}catch(_){}ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY)});
+cv.addEventListener("pointermove",e=>{if(!drawing)return;ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();signed=true});
+["pointerup","pointercancel","pointerleave"].forEach(t=>cv.addEventListener(t,()=>{drawing=false}));
+$("sigClear").addEventListener("click",sizeCv);
+
+function pinCheck(){const a=$("dPinA").value.trim(),b=$("dPinB").value.trim(),m=$("pinMsg");
+  if(a.length===4&&b.length===4){const ok=a===b;m.className="full "+(ok?"okc":"badc");
+    m.textContent=ok?"✓ PIN correcto. Podés entregar.":"✗ El PIN no coincide. No entregues y llamá al cliente.";return ok}
+  m.textContent="";return false}
+$("dPinA").addEventListener("input",pinCheck);$("dPinB").addEventListener("input",pinCheck);
+
+$("dPhoto").addEventListener("change",()=>{const f=$("dPhoto").files[0];if(photoURL)URL.revokeObjectURL(photoURL);
+  photoURL=f?URL.createObjectURL(f):"";$("dPrev").src=photoURL;$("dPrev").style.display=photoURL?"block":"none"});
+
+const maskCed=c=>{const s=c.replace(/-/g,"").toUpperCase();return `${s.slice(0,3)}-******-${s.slice(9)}`};
+$("g").addEventListener("submit",e=>{
+  e.preventDefault();const err=m=>{$("gErr").textContent=m};
+  const code=$("dCode").value.trim().toUpperCase(),name=$("dName").value.trim(),ced=$("dCed").value.trim();
+  const rate=(document.querySelector('input[name="rate"]:checked')||{}).value;
+  if(!code)return err("Falta el número de pedido.");
+  if(!pinCheck())return err("Verificá el PIN antes de entregar.");
+  if(!name)return err("Falta el nombre de quien recibe.");
+  if(!/^\d{3}-?\d{6}-?\d{4}[A-Za-z]$/.test(ced))return err("La cédula no tiene el formato correcto (ej.: 001-010180-0001A).");
+  if(!signed)return err("Falta la firma.");
+  if(!$("dOk").checked)return err("Falta marcar «Recibí el pedido completo y en buen estado».");
+  if(!rate)return err("Falta la calificación con estrellas.");
+  err("");
+  const when=new Date().toLocaleString("es-NI",{dateStyle:"medium",timeStyle:"short"});
+  const stars="★".repeat(rate)+"☆".repeat(5-rate),com=$("dCom").value.trim(),sigURL=cv.toDataURL("image/png");
+  $("proof").innerHTML=`<div class="hd"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7 12.5l3.2 3.2L17 9"/></svg>Entrega verificada</div>`+
+    (photoURL?`<img class="photo" src="${photoURL}" alt="Foto de la entrega">`:"")+
+    `<dl><dt>Pedido</dt><dd>${esc(code)}</dd><dt>Recibí conforme</dt><dd>${esc(name)}</dd><dt>Cédula</dt><dd>${esc(maskCed(ced))}</dd>`+
+    `<dt>Fecha y hora</dt><dd>${esc(when)}</dd><dt>PIN</dt><dd class="okc">Verificado ✓</dd><dt>Calificación</dt><dd><span class="starsv">${stars}</span> ${rate}/5</dd>`+
+    (com?`<dt>Comentario</dt><dd>${esc(com)}</dd>`:"")+`</dl>`+
+    `<div style="padding:0 22px 18px"><div class="hint" style="margin-bottom:6px">Firma</div><img class="sigimg" src="${sigURL}" alt="Firma de ${esc(name)}"></div>`+
+    `<div class="ft"><b style="font-family:Sora,sans-serif;color:var(--ink)">cerquita</b> · Lo pedís desde lejos. Lo ves llegar.</div>`;
+  proofText=[`*Cerquita · Entrega verificada ✓*`,`Paso 6 de 6 · Pedido completado`,`Pedido: ${code}`,`Recibí conforme: ${name}`,`Cédula: ${maskCed(ced)}`,`Fecha y hora: ${when}`,
+    `PIN: verificado`,`Calificación: ${stars} (${rate}/5)`,com?`Comentario: "${com}"`:"",``,`Lo pedís desde lejos. Lo ves llegar.`].filter(Boolean).join("\n");
+  $("g").style.display="none";$("proofWrap").style.display="block";$("proofWrap").scrollIntoView({behavior:"smooth",block:"start"});
+});
+$("pCopy").addEventListener("click",()=>sendPdf($("proof"),"Comprobante-"+($("dCode").value.trim().toUpperCase()||"entrega")+".pdf",$("dWa").value,proofText,$("pMsg"),"Comprobante de entrega verificada"));
+$("pDown").addEventListener("click",()=>downPdf($("proof"),"Comprobante-"+($("dCode").value.trim().toUpperCase()||"entrega")+".pdf",$("pMsg")));
+$("pNew").addEventListener("click",()=>{$("g").reset();$("pinMsg").textContent="";$("dPrev").style.display="none";if(photoURL)URL.revokeObjectURL(photoURL);photoURL="";
+  $("proofWrap").style.display="none";$("g").style.display="";sizeCv();window.scrollTo(0,0)});
+
+/* ---------- Aceptación formal ---------- */
+function makePad(c){const x=c.getContext("2d");let dn=false,s=false;
+  const resize=()=>{const r=c.getBoundingClientRect();if(!r.width)return;const d=window.devicePixelRatio||1;c.width=Math.round(r.width*d);c.height=Math.round(r.height*d);
+    x.setTransform(d,0,0,d,0,0);x.lineWidth=4;x.lineCap="round";x.lineJoin="round";x.strokeStyle="#1546D8";s=false};
+  c.addEventListener("pointerdown",e=>{dn=true;try{c.setPointerCapture(e.pointerId)}catch(_){}x.beginPath();x.moveTo(e.offsetX,e.offsetY)});
+  c.addEventListener("pointermove",e=>{if(!dn)return;x.lineTo(e.offsetX,e.offsetY);x.stroke();s=true});
+  ["pointerup","pointercancel","pointerleave"].forEach(t=>c.addEventListener(t,()=>{dn=false}));
+  return {resize,signed:()=>s,url:()=>c.toDataURL("image/png")}}
+const aPad=makePad($("aSig"));
+const aObs=new ResizeObserver(()=>{if(!aPad.signed())aPad.resize()});aObs.observe($("aSig"));
+$("aSigClear").addEventListener("click",aPad.resize);
+const num=id=>{const n=parseFloat(($(id).value||"").replace(/[^\d.]/g,""));return isNaN(n)?0:n};
+const money=n=>n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+function aCalc(){$("aTotal").textContent=$("aCur").value+" "+money(num("aProd")+num("aShip")+num("aFee"))}
+["aProd","aShip","aFee","aCur"].forEach(i=>$(i).addEventListener("input",aCalc));$("aCur").addEventListener("change",aCalc);aCalc();
+$("aRaw").addEventListener("input",()=>{const t=$("aRaw").value,g=r=>(t.match(r)||[])[1]||"";
+  const code=g(/(CQ-\d{6}-\d{4})/i),env=t.match(/Env[ií]a:\*?\s*([^(\n]+)\(([^)]+)\)/i),rec=g(/Recibe:\*?\s*([^(·\n]+)/i);
+  if(code)$("aCode").value=code.toUpperCase();if(env){$("aClient").value=env[1].trim();$("aCountry").value=env[2].trim()}
+  if(rec)$("aBenef").value=rec.trim();const wa=g(/WhatsApp:\s*([+\d][\d\s()-]{6,})/i);if(wa)$("aWa").value=wa.trim();
+  const li=t.indexOf("*Lista:*");if(li>=0){const tail=t.slice(li+8).split("\n").filter(l=>/^\s*(•|↳)/.test(l)).map(l=>l.replace(/^\s*•\s*/,"").replace(/^\s*↳\s*/,"   ↳ ")).join("\n");if(tail)$("aDesc").value=tail}});
+let docText="";
+$("h").addEventListener("submit",e=>{
+  e.preventDefault();const err=m=>{$("hErr").textContent=m};
+  for(const [id,m] of [["aCode","el número de pedido"],["aClient","el nombre del cliente"],["aBenef","el beneficiario"],["aDesc","la descripción del encargo"],["aName","tu nombre"],["aRole","tu cargo"]])
+    if(!$(id).value.trim()){$(id).focus();return err("Falta "+m+".")}
+  if(num("aProd")<=0){$("aProd").focus();return err("Falta el monto de los productos.")}
+  if(!aPad.signed())return err("Falta la firma del responsable.");
+  err("");
+  const now=new Date(),tz="America/Managua";
+  const fecha=now.toLocaleDateString("es-NI",{timeZone:tz,day:"numeric",month:"long",year:"numeric"});
+  const hora=now.toLocaleTimeString("es-NI",{timeZone:tz,hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
+  const vence=new Date(now.getTime()+(+$("aValid").value)*3600e3);
+  const venceTxt=vence.toLocaleString("es-NI",{timeZone:tz,day:"numeric",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});
+  const code=$("aCode").value.trim().toUpperCase(),docNo="AC-"+code.replace(/^CQ-/,"");lastDocNo=docNo;
+  const cur=$("aCur").value,P=num("aProd"),S=num("aShip"),Fe=num("aFee"),T=P+S+Fe;
+  const ent=$("aDate").value?new Date($("aDate").value+"T12:00:00").toLocaleDateString("es-NI",{day:"numeric",month:"long",year:"numeric"}):"Por confirmar";
+  const v=id=>esc($(id).value.trim()),bank=$("aBank").value.trim();
+  $("doc").innerHTML=`<header class="dh"><svg width="46" height="46" viewBox="0 0 120 120" aria-hidden="true"><path d="M88.3 26.3 A44 44 0 1 0 88.3 93.7" fill="none" stroke="#F7F5F0" stroke-width="15" stroke-linecap="round"/><circle cx="88.3" cy="26.3" r="10" fill="#13A89E"/><path d="M60 76 C 45 65, 42 55, 49 49 C 54 45, 60 48, 60 53 C 60 48, 66 45, 71 49 C 78 55, 75 65, 60 76 Z" fill="#F08A4B"/></svg>
+    <div><div class="bn">cerquita</div><div style="font-size:13px;color:#7FD8CF">Compras de confianza · Managua, Nicaragua</div></div>
+    <div class="meta">Documento N.º<br><b>${esc(docNo)}</b></div></header>
+  <div class="db">
+    <h3>CONSTANCIA DE ACEPTACIÓN DE PEDIDO</h3>
+    <p class="sub">Referencia del pedido: ${esc(code)}</p>
+    <div class="clock">Pedido aceptado formalmente el <b>${esc(fecha)}</b> a las <b>${esc(hora)}</b> (hora de Managua, UTC−6).</div>
+    <table>
+      <tr><td>Cliente</td><td>${v("aClient")}${$("aCountry").value.trim()?" · "+v("aCountry"):""}</td></tr>
+      <tr><td>Beneficiario en Managua</td><td>${v("aBenef")}</td></tr>
+      <tr><td>Descripción del encargo</td><td style="white-space:pre-line">${v("aDesc")}</td></tr>
+      <tr><td>Fecha estimada de entrega</td><td>${esc(ent)}</td></tr>
+      <tr><td>Productos</td><td class="n">${cur} ${money(P)}</td></tr>
+      <tr><td>Costo de entrega</td><td class="n">${cur} ${money(S)}</td></tr>
+      <tr><td>Tarifa de servicio</td><td class="n">${cur} ${money(Fe)}</td></tr>
+      <tr class="tot"><td>Total a transferir</td><td class="n">${cur} ${money(T)}</td></tr>
+      ${bank?`<tr><td>Datos para la transferencia</td><td style="white-space:pre-line">${esc(bank)}</td></tr>`:""}
+    </table>
+    <ol>
+      <li>Cerquita acepta el encargo descrito y se compromete a ejecutarlo una vez confirmada la transferencia por el total indicado.</li>
+      <li>Esta cotización es válida hasta el ${esc(venceTxt)}. Pasado ese plazo, los precios podrán actualizarse previa consulta con el cliente.</li>
+      <li>Las compras se realizarán únicamente por lo aprobado. Cualquier sustitución de productos se consultará con el cliente antes de realizarse, y todo excedente será devuelto o acreditado como saldo a favor.</li>
+      <li>El cliente recibirá copia escaneada de las facturas de compra. La entrega se hará solo a la persona que confirme el PIN del pedido, con recibí conforme firmado y comprobante fotográfico.</li>
+    </ol>
+    <div class="ts">
+      <div class="sigb"><img src="${aPad.url()}" alt="Firma de ${v("aName")}"><div class="ln"><b>${v("aName")}</b><br>${v("aRole")} · Cerquita</div></div>
+      <div class="stamp" aria-hidden="true">ACEPTADO<small>${esc(hora)}</small></div>
+    </div>
+  </div>
+  <footer class="df">Documento generado electrónicamente por Cerquita el ${esc(fecha)} a las ${esc(hora)}. Conserve este documento como respaldo de su pedido.</footer>`;
+  storeOrder(code,{codigo:code,cliente:$("aClient").value.trim(),pais:$("aCountry").value.trim(),whatsapp:$("aWa").value.trim(),beneficiario:$("aBenef").value.trim(),
+    articulos:$("aDesc").value.trim(),moneda:cur,total:money(T),fechaAceptacion:fecha+" "+hora,fechaEntrega:ent});
+  docText=[`*CERQUITA · CONSTANCIA DE ACEPTACIÓN DE PEDIDO*`,`Documento N.º ${docNo} · Pedido ${code}`,`Paso 2 de 6 · Cotización y aceptación ✓`,`Lo que sigue: paso 3, confirmación de tu pago.`,``,`Aceptado el ${fecha} a las ${hora} (hora de Managua)`,``,
+    `Cliente: ${$("aClient").value.trim()}`,`Beneficiario: ${$("aBenef").value.trim()}`,`Entrega estimada: ${ent}`,``,
+    `Productos: ${cur} ${money(P)}`,`Entrega: ${cur} ${money(S)}`,`Servicio: ${cur} ${money(Fe)}`,`*Total a transferir: ${cur} ${money(T)}*`,
+    bank?`\nDatos para la transferencia:\n${bank}`:"",``,`Cotización válida hasta el ${venceTxt}.`,`Aceptado por: ${$("aName").value.trim()}, ${$("aRole").value.trim()}`].filter(l=>l!==null).join("\n");
+  $("uCode").value=code;$("uOut").textContent=aviso();
+  if(API_URL&&pKey){$("dMsg").textContent="Registrando la aceptación en la hoja de pedidos…";
+    api({action:"aceptar",key:pKey,codigo:code,fechaAceptacion:fecha+" "+hora,aceptadoPor:$("aName").value.trim()+", "+$("aRole").value.trim(),moneda:cur,total:T})
+    .then(r=>{$("dMsg").textContent=r&&r.ok?"Aceptación registrada en la hoja de pedidos ✓ Ya podés enviar la constancia en PDF.":"La constancia está lista, pero no se pudo registrar en la hoja ("+(r&&r.error||"error")+")."; if(r&&r.ok)loadOrders()})
+    .catch(()=>{$("dMsg").textContent="La constancia está lista, pero no se pudo registrar en la hoja. Revisá tu conexión."});}
+  $("h").style.display="none";$("docWrap").style.display="block";$("docWrap").scrollIntoView({behavior:"smooth",block:"start"});
+});
+$("dCopy").addEventListener("click",()=>sendPdf($("doc"),"Constancia-"+(lastDocNo||"pedido")+".pdf",$("aWa").value,docText,$("dMsg"),"Constancia de aceptación de pedido"));
+$("dDown").addEventListener("click",()=>downPdf($("doc"),"Constancia-"+(lastDocNo||"pedido")+".pdf",$("dMsg")));
+$("dNew").addEventListener("click",()=>{$("h").reset();aCalc();$("docWrap").style.display="none";$("h").style.display="";aPad.resize();window.scrollTo(0,0)});
+
+function aviso(){const c=$("uCode").value.trim().toUpperCase()||"(pedido)",s=+$("uStep").value,eta=$("uEta").value;
+  const L={3:[`Paso 3 de 6 · Pago confirmado ✓`,`Recibimos tu transferencia. Gracias por tu confianza.`,`Lo que sigue: paso 4, preparamos tu pedido y te enviamos la factura escaneada.`],
+    4:[`Paso 4 de 6 · Compras en proceso`,`Tu pedido está siendo preparado. Te adjuntamos la factura escaneada.`,`Lo que sigue: paso 5, tu pedido sale hacia la casa de tu familia.`],
+    5:[`Paso 5 de 6 · En camino`,`Tu pedido va en ${$("uVeh").value.toLowerCase()} hacia la casa de tu familia.${eta?` Hora estimada de llegada: ${eta}.`:""}`,`Lo que sigue: paso 6, tu familiar dice el PIN, firma y te mandamos el comprobante.`]}[s];
+  return [`*Cerquita · Pedido ${c}*`,L[0],``,L[1],``,L[2]].join("\n")}
+["uCode","uStep","uVeh","uEta"].forEach(i=>{$(i).addEventListener("input",()=>{$("uOut").textContent=aviso()});$(i).addEventListener("change",()=>{$("uOut").textContent=aviso()})});
+$("uOut").textContent=aviso();
+$("uCopy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(aviso());$("uCopy").textContent="Aviso copiado ✓"}catch(e){$("uCopy").textContent="Copiá el texto de abajo"}setTimeout(()=>{$("uCopy").textContent="Copiar aviso"},2500)});
+
+/* ---------- Recibo oficial de pago ---------- */
+function letras(n){
+  const U=["cero","uno","dos","tres","cuatro","cinco","seis","siete","ocho","nueve","diez","once","doce","trece","catorce","quince","dieciséis","diecisiete","dieciocho","diecinueve","veinte","veintiuno","veintidós","veintitrés","veinticuatro","veinticinco","veintiséis","veintisiete","veintiocho","veintinueve"];
+  const D=["","","","treinta","cuarenta","cincuenta","sesenta","setenta","ochenta","noventa"];
+  const C=["","ciento","doscientos","trescientos","cuatrocientos","quinientos","seiscientos","setecientos","ochocientos","novecientos"];
+  const c99=x=>x<30?U[x]:D[Math.floor(x/10)]+(x%10?" y "+U[x%10]:"");
+  const c999=x=>x===100?"cien":(x>=100?C[Math.floor(x/100)]+(x%100?" "+c99(x%100):""):c99(x));
+  const ap=t=>t.replace(/veintiuno$/,"veintiún").replace(/uno$/,"un");
+  if(n===0)return "cero";let out=[];const mill=Math.floor(n/1e6),mil=Math.floor(n%1e6/1000),r=n%1000;
+  if(mill)out.push(mill===1?"un millón":ap(c999(mill))+" millones");
+  if(mil)out.push(mil===1?"mil":ap(c999(mil))+" mil");
+  if(r)out.push(c999(r));return out.join(" ");
+}
+function enLetras(v,cur){const ent=Math.floor(v+1e-9),cts=Math.round((v-ent)*100);let t=letras(ent);
+  const mon=cur==="US$"?(ent===1?"dólar":"dólares"):(ent===1?"córdoba":"córdobas");
+  t=t.replace(/veintiuno$/,"veintiún").replace(/(^|\s)uno$/,"$1un");
+  if(/(millón|millones)$/.test(t))t+=" de";
+  return (t.charAt(0).toUpperCase()+t.slice(1))+" "+mon+" con "+String(cts).padStart(2,"0")+"/100";}
+const kPad=makePad($("kSig"));
+const kObs=new ResizeObserver(()=>{if(!kPad.signed())kPad.resize()});kObs.observe($("kSig"));
+$("kSigClear").addEventListener("click",kPad.resize);
+let rText="",vNo="";
+function bars(code){let x=0,out="";for(const ch of code+code){const c=ch.charCodeAt(0);for(let b=0;b<4;b++){const w=((c>>b)&1)+1;if(b%2===0)out+=`<rect x="${x}" y="0" width="${w}" height="46" fill="#0B2545"/>`;x+=w+1}}
+  return `<svg class="bars" width="${x}" height="46" viewBox="0 0 ${x} 46" aria-hidden="true">${out}</svg>`}
+$("k").addEventListener("submit",e=>{
+  e.preventDefault();const err=m=>{$("kErr").textContent=m};
+  for(const [id,m] of [["kCode","el número de pedido"],["kClient","el nombre del cliente"],["kBank","el banco de origen"],["kRef","el número de referencia"],["kWhen","la fecha de la transferencia"],["kName","tu nombre"],["kRole","tu cargo"]])
+    if(!$(id).value.trim()){$(id).focus();return err("Falta "+m+".")}
+  const amt=num("kAmt");if(amt<=0){$("kAmt").focus();return err("Falta el monto recibido.")}
+  if($("kAcct").value&&!/^\d{4}$/.test($("kAcct").value)){$("kAcct").focus();return err("La cuenta de destino debe tener 4 dígitos.")}
+  if(!kPad.signed())return err("Falta la firma del responsable.");
+  err("");
+  const now=new Date(),tz="America/Managua";
+  const fecha=now.toLocaleDateString("es-NI",{timeZone:tz,day:"numeric",month:"long",year:"numeric"});
+  const hora=now.toLocaleTimeString("es-NI",{timeZone:tz,hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
+  const corta=now.toLocaleDateString("es-NI",{timeZone:tz,day:"2-digit",month:"2-digit",year:"numeric"});
+  const code=$("kCode").value.trim().toUpperCase(),no="RP-"+code.replace(/^CQ-/,"");vNo=no;
+  const cur=$("kCur").value,m=cur+" "+money(amt),words=enLetras(amt,cur);
+  const tw=new Date($("kWhen").value);const twTxt=isNaN(tw)?$("kWhen").value:tw.toLocaleString("es-NI",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});
+  const concept=$("kConcept").value.trim()||"Pago del pedido "+code;
+  const ver=(no.replace(/\D/g,"").slice(-6)+Math.random().toString(36).slice(2,6)).toUpperCase();
+  const acct=$("kAcct").value?"**** "+$("kAcct").value:"";
+  const v=id=>esc($(id).value.trim()),sig=kPad.url();
+  const logo=(c)=>`<svg width="46" height="46" viewBox="0 0 120 120" aria-hidden="true"><path d="M88.3 26.3 A44 44 0 1 0 88.3 93.7" fill="none" stroke="${c}" stroke-width="15" stroke-linecap="round"/><circle cx="88.3" cy="26.3" r="10" fill="#13A89E"/><path d="M60 76 C 45 65, 42 55, 49 49 C 54 45, 60 48, 60 53 C 60 48, 66 45, 71 49 C 78 55, 75 65, 60 76 Z" fill="#F08A4B"/></svg>`;
+  const quoted=num("kQuoted"),diff=amt-quoted,partial=quoted>0&&diff<=-0.005;
+  const sec=(t,rows)=>{const r=rows.filter(([,x])=>String(x||"").trim());return r.length?`<h4>${t.toUpperCase()}</h4><table>${r.map(([l,x])=>`<tr><td>${esc(l)}</td><td style="white-space:pre-line">${esc(String(x).trim())}</td></tr>`).join("")}</table>`:""};
+  storeOrder(code,{codigo:code,cliente:$("kClient").value.trim(),whatsapp:$("kWa").value.trim(),pais:$("kCountry").value.trim(),correo:$("kMail").value.trim(),beneficiario:$("kBenef").value.trim(),
+    parentesco:$("kRel").value.trim(),telBeneficiario:$("kBTel").value.trim(),direccion:$("kAddr").value.trim(),articulos:$("kDesc").value.trim(),fechaAceptacion:$("kAccepted").value.trim(),vehiculo:$("kVeh").value.trim()});
+  $("rDoc").innerHTML=`<header class="dh">${logo("#F7F5F0")}<div><div class="bn">cerquita</div><div style="font-size:13px;color:#7FD8CF">Compras de confianza · Managua, Nicaragua</div></div>
+    <div class="meta">Recibo N.º<br><b>${esc(no)}</b></div></header>
+  <div class="db"><h3>RECIBO OFICIAL DE PAGO</h3><p class="sub">Referencia del pedido: ${esc(code)} · Etapa 3 de 6, confirmación de pago</p>
+    <div class="clock">Pago confirmado el <b>${esc(fecha)}</b> a las <b>${esc(hora)}</b> (hora de Managua, UTC−6).</div>
+    ${sec("Datos del cliente",[["Cliente",$("kClient").value],["País de residencia",$("kCountry").value],["WhatsApp",$("kWa").value],["Correo electrónico",$("kMail").value]])}
+    ${sec("Beneficiario y entrega",[["Beneficiario",$("kBenef").value+($("kRel").value.trim()?" ("+$("kRel").value.trim()+")":"")],["Teléfono",$("kBTel").value],["Zona",$("kZone").value],["Dirección de entrega",$("kAddr").value],["Fecha estimada de entrega",$("kDeliv").value],["Vehículo asignado",$("kVeh").value]])}
+    ${sec("Detalle del pedido",[["Número de pedido",code],["Fecha de aceptación",$("kAccepted").value],["Artículos y servicios",$("kDesc").value]])}
+    <h4>DATOS DEL PAGO</h4>
+    <table>
+      <tr><td>Recibimos de</td><td>${v("kClient")}</td></tr>
+      <tr><td>La cantidad de</td><td><b>${esc(words)}</b></td></tr>
+      <tr><td>Concepto</td><td>${esc(concept)}</td></tr>
+      <tr><td>Forma de pago</td><td>Transferencia bancaria</td></tr>
+      <tr><td>Banco de origen</td><td>${v("kBank")}</td></tr>
+      <tr><td>N.º de referencia</td><td>${v("kRef")}</td></tr>
+      <tr><td>Fecha de la transferencia</td><td>${esc(twTxt)}</td></tr>
+      ${acct?`<tr><td>Cuenta de destino</td><td>${esc(acct)}</td></tr>`:""}
+      ${quoted>0?`<tr><td>Total cotizado</td><td class="n">${esc(cur+" "+money(quoted))}</td></tr>`:""}
+      <tr class="tot"><td>Total recibido</td><td class="n">${esc(m)}</td></tr>
+      ${quoted>0&&Math.abs(diff)>=0.005?`<tr><td>${diff<0?"Saldo pendiente":"Excedente a favor del cliente"}</td><td class="n ${diff<0?"neg":""}">${esc(cur+" "+money(Math.abs(diff)))}</td></tr>`:""}
+    </table>
+    <ol><li>Cerquita confirma la acreditación de los fondos detallados en este recibo y da inicio a la etapa 4, gestión de compras, conforme a la constancia de aceptación del pedido.</li>
+      <li>Todo excedente que resulte de las compras será devuelto al cliente o acreditado como saldo a su favor.</li></ol>
+    <div class="ts"><div class="sigb"><img src="${sig}" alt="Firma de ${v("kName")}"><div class="ln"><b>${v("kName")}</b><br>${v("kRole")} · Cerquita</div></div>
+      <div class="stamp" aria-hidden="true">${partial?"PAGO<br>PARCIAL":"PAGADO"}<small>${esc(hora)}</small></div></div>
+  </div><footer class="df">Recibo emitido electrónicamente por Cerquita el ${esc(fecha)} a las ${esc(hora)}. Código de verificación ${esc(ver)}. Este recibo confirma la recepción del pago por parte de Cerquita y no sustituye el comprobante emitido por su banco.</footer>`;
+  $("vDoc").innerHTML=`<div class="vh">${logo("#0B2545")}<div class="bn">cerquita</div><small>Compras de confianza · Managua</small><small>WhatsApp +505 8707 2125</small></div>
+    <div class="vt">COMPROBANTE ELECTRÓNICO<br>DE PAGO RECIBIDO</div><hr>
+    <div class="ln"><span>Comprobante</span><span>${esc(no)}</span></div>
+    <div class="ln"><span>Fecha de emisión</span><span>${esc(corta)}</span></div>
+    <div class="ln"><span>Hora de emisión</span><span>${esc(hora)}</span></div>
+    <div class="ln"><span>Pedido</span><span>${esc(code)}</span></div><hr>
+    <div class="ln"><span>Cliente</span><span>${v("kClient")}</span></div>
+    ${$("kCountry").value.trim()?`<div class="ln"><span>País</span><span>${v("kCountry")}</span></div>`:""}
+    ${$("kWa").value.trim()?`<div class="ln"><span>WhatsApp</span><span>${v("kWa")}</span></div>`:""}
+    ${$("kBenef").value.trim()?`<div class="ln"><span>Beneficiario</span><span>${v("kBenef")}</span></div>`:""}
+    ${$("kZone").value.trim()?`<div class="ln"><span>Zona de entrega</span><span>${v("kZone")}</span></div>`:""}
+    ${$("kDeliv").value.trim()?`<div class="ln"><span>Entrega estimada</span><span>${v("kDeliv")}</span></div>`:""}<hr>
+    <div class="ln"><span>Forma de pago</span><span>Transferencia</span></div>
+    <div class="ln"><span>Banco de origen</span><span>${v("kBank")}</span></div>
+    <div class="ln"><span>Referencia</span><span>${v("kRef")}</span></div>
+    <div class="ln"><span>Fecha transferencia</span><span>${esc(twTxt)}</span></div>
+    ${acct?`<div class="ln"><span>Cuenta destino</span><span>${esc(acct)}</span></div>`:""}
+    <div class="ln"><span>Concepto</span><span>${esc(concept)}</span></div><hr>
+    ${quoted>0?`<div class="ln"><span>Total cotizado</span><span>${esc(cur+" "+money(quoted))}</span></div>`:""}
+    <div class="amt"><small>MONTO RECIBIDO</small><b>${esc(m)}</b><small>${esc(words)}</small></div>
+    ${quoted>0&&Math.abs(diff)>=0.005?`<div class="ln"><span>${diff<0?"Saldo pendiente":"Excedente a favor"}</span><span style="${diff<0?"color:#B3261E":""}">${esc(cur+" "+money(Math.abs(diff)))}</span></div>`:""}
+    <div class="ok"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0E8A82" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7 12.5l3.2 3.2L17 9"/></svg>${partial?"PAGO PARCIAL RECIBIDO":"PAGO CONFIRMADO"}</div><hr>
+    <div class="ln"><span>Confirmado por</span><span>${v("kName")}</span></div>
+    <div class="ln"><span>Cargo</span><span>${v("kRole")}</span></div>
+    ${bars(ver)}<div class="code">${esc(ver)}</div>
+    <div style="text-align:center;font:700 12px Sora,sans-serif;letter-spacing:.3px;margin-top:12px;padding:8px;border:1.5px solid #0B2545;border-radius:6px">DOCUMENTO ELECTRÓNICO VÁLIDO SIN FIRMA NI SELLO</div>
+    <p class="fine">Comprobante emitido electrónicamente por Cerquita. Por su carácter electrónico no requiere firma autógrafa ni sello; su autenticidad se verifica con el código impreso. Confirma la recepción del pago y no sustituye el comprobante emitido por su banco. Consérvelo como respaldo de su pedido.</p>`;
+  rText=[`*Cerquita · Recibo oficial de pago*`,`Recibo N.º ${no} · Pedido ${code}`,`Paso 3 de 6 · Pago confirmado ✓`,``,`Recibimos de ${$("kClient").value.trim()} la cantidad de ${m} (${words}).`,`Referencia: ${$("kRef").value.trim()}`,`Emitido el ${fecha} a las ${hora}.`,``,`Lo que sigue: paso 4, preparamos tu pedido y te enviamos la factura escaneada.`].join("\n");
+  $("k").style.display="none";$("kOut").style.display="block";$("rMsg").textContent="";$("vMsg").textContent="";
+  $("kOut").scrollIntoView({behavior:"smooth",block:"start"});
+  if(API_URL&&pKey)api({action:"estado",key:pKey,codigo:code,estado:"Pago"}).then(r=>{$("rMsg").textContent=r&&r.ok?"Pago registrado en la hoja de pedidos ✓ El pedido pasó a la etapa «Pago».":"El recibo está listo, pero no se pudo actualizar la hoja.";if(r&&r.ok)loadOrders()}).catch(()=>{});
+});
+$("rSend").addEventListener("click",()=>sendPdf($("rDoc"),"Recibo-"+vNo+".pdf",$("kWa").value,rText,$("rMsg"),"Recibo oficial de pago"));
+$("rDown").addEventListener("click",()=>downPdf($("rDoc"),"Recibo-"+vNo+".pdf",$("rMsg")));
+$("vSend").addEventListener("click",()=>sendPdf($("vDoc"),"Voucher-"+vNo+".pdf",$("kWa").value,rText,$("vMsg"),"Comprobante electrónico de pago","ticket"));
+$("vDown").addEventListener("click",()=>downPdf($("vDoc"),"Voucher-"+vNo+".pdf",$("vMsg"),"ticket"));
+$("kNew").addEventListener("click",()=>{$("k").reset();kEdit=false;renderKSum();$("kOut").style.display="none";$("k").style.display="";kPad.resize();window.scrollTo(0,0)});
+let kEdit=false;
+function setLookupMode(on){
+  document.querySelectorAll("#kKnown fieldset").forEach((fs,i)=>{if(i>0)fs.style.display=on?"none":""});
+  document.querySelectorAll("#kKnown fieldset:first-of-type > label, #kKnown fieldset:first-of-type > p").forEach(l=>{if(l.id!=="kCodeLbl")l.style.display=on?"none":""});
+}
+function renderKSum(){
+  const loaded=!!($("kCode").value.trim()&&$("kClient").value.trim()),box=$("kSum");
+  $("kKnown").style.display=loaded&&!kEdit?"none":"";
+  setLookupMode(!loaded&&!kEdit);
+  if(!loaded){box.classList.remove("on");box.innerHTML="";
+    if(!kEdit&&!$("kLook").textContent)$("kLook").innerHTML=`<p class="hint" style="margin:0">Escribí el número de pedido y cargamos automáticamente todos los datos registrados en las etapas anteriores. <button type="button" class="btn sec" id="kManual" style="margin-top:10px">Ingresar los datos manualmente</button></p>`;
+    const mb=$("kManual");if(mb)mb.onclick=()=>{kEdit=true;$("kLook").textContent="";renderKSum()};return}
+  $("kLook").textContent="";
+  box.classList.add("on");
+  const g=id=>$(id).value.trim(),rows=[["Pedido",g("kCode")],["Cliente",g("kClient")+(g("kCountry")?" ("+g("kCountry")+")":"")],["WhatsApp",g("kWa")],["Correo",g("kMail")],
+    ["Beneficiario",g("kBenef")+(g("kRel")?" ("+g("kRel")+")":"")+(g("kBTel")?" · Tel. "+g("kBTel"):"")],["Zona",g("kZone")],["Dirección",g("kAddr")],
+    ["Entrega estimada",g("kDeliv")],["Vehículo",g("kVeh")],["Artículos",g("kDesc")],["Aceptado",g("kAccepted")],["Total cotizado",g("kQuoted")?$("kCur").value+" "+money(num("kQuoted")):""]].filter(([,v])=>v);
+  box.innerHTML=`<div class="kh"><b>Datos del pedido</b><span class="okc">✓ Cargados del pedido</span><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn sec" id="kEditBtn">${kEdit?"Ocultar datos":"Corregir datos"}</button><button type="button" class="btn sec" id="kChange">Cambiar pedido</button></span></div>
+    <p class="hint" style="margin:0">Solo completá los datos de la transferencia y la firma.</p>
+    <dl>${rows.map(([l,v])=>`<dt>${esc(l)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>`;
+  $("kEditBtn").addEventListener("click",()=>{kEdit=!kEdit;renderKSum()});
+  $("kChange").addEventListener("click",()=>{$("k").reset();kEdit=false;$("kLook").textContent="";renderKSum();$("kCode").focus()});
+}
+["kKnown"].forEach(id=>$(id).addEventListener("change",()=>{if(kEdit)renderKSum()}));
+function storeOrder(code,o){const m=lsGet("cerquita-orders",{});m[code]=Object.assign({},m[code]||{},Object.fromEntries(Object.entries(o).filter(([,v])=>v!==""&&v!=null)));
+  const ks=Object.keys(m);if(ks.length>200)delete m[ks[0]];lsSet("cerquita-orders",m)}
+function findOrder(code){const fromList=(typeof orders!=="undefined"&&orders.find(x=>x.codigo===code))||{};return Object.assign({},fromList,lsGet("cerquita-orders",{})[code]||{})}
+const KMAP=[["kClient","cliente"],["kWa","whatsapp"],["kCountry","pais"],["kMail","correo"],["kBenef","beneficiario"],["kRel","parentesco"],["kBTel","telBeneficiario"],
+  ["kAddr","direccion"],["kDesc","articulos"],["kAccepted","fechaAceptacion"],["kVeh","vehiculo"]];
+function fillPagoFrom(o,force){KMAP.forEach(([id,k])=>{if(o[k]&&(force||!$(id).value.trim()))$(id).value=o[k]});
+  const zone=[o.barrio,o.distrito].filter(Boolean).join(", ");if(zone&&(force||!$("kZone").value.trim()))$("kZone").value=zone;
+  const deliv=o.fechaEntrega||[o.fechaDeseada,o.horario].filter(Boolean).join(" · ");if(deliv&&(force||!$("kDeliv").value.trim()))$("kDeliv").value=deliv;
+  if(o.moneda)$("kCur").value=o.moneda;
+  if(o.total){const t=String(o.total).replace(/[^\d.]/g,"");if(force||!$("kQuoted").value.trim())$("kQuoted").value=t;if(force||!$("kAmt").value.trim())$("kAmt").value=t}}
+function prefillPago(o){$("k").reset();$("kOut").style.display="none";$("k").style.display="";
+  const full=Object.assign({},findOrder(o.codigo||""),o);$("kCode").value=full.codigo||"";fillPagoFrom(full,true);kEdit=false;renderKSum();location.hash="#pago";setTimeout(()=>{const f=$("kBank");if(f&&$("kKnown").style.display==="none")f.focus()},350)}
+function normCode(v){v=String(v||"").trim().toUpperCase().replace(/\s+/g,"");const m=v.match(/^(?:CQ-?)?(\d{6})-?(\d{4})$/);return m?`CQ-${m[1]}-${m[2]}`:v}
+let kLookSeq=0;
+async function lookupPedido(){
+  const c=normCode($("kCode").value);if(!/^CQ-\d{6}-\d{4}$/.test(c))return;
+  if($("kCode").value!==c)$("kCode").value=c;
+  const seq=++kLookSeq;$("kLook").innerHTML=`<p class="hint" style="margin:0">Buscando el pedido ${esc(c)}…</p>`;
+  let o=findOrder(c);
+  if(API_URL&&pKey&&!o.cliente){try{const r=await api({action:"listar",key:pKey});if(r&&r.ok){orders=r.pedidos||[];o=findOrder(c)}}catch(e){}}
+  if(seq!==kLookSeq)return;
+  if(o&&(o.cliente||o.beneficiario||o.articulos)){fillPagoFrom(Object.assign({codigo:c},o),true);kEdit=false;renderKSum();
+    setTimeout(()=>{if($("kKnown").style.display==="none")$("kBank").focus()},100)}
+  else{$("kLook").innerHTML=`<p class="badc" style="margin:0">No encontramos datos del pedido ${esc(c)}. Revisá el número${API_URL?"":" o entrá primero al Panel de pedidos"}, o ingresá los datos manualmente.</p><button type="button" class="btn sec" id="kManual2" style="margin-top:10px">Ingresar los datos manualmente</button>`;
+    $("kManual2").onclick=()=>{kEdit=true;$("kLook").textContent="";renderKSum()}}
+}
+$("kCode").addEventListener("input",()=>{if(/^(CQ-?)?\d{6}-?\d{4}$/i.test($("kCode").value.trim().replace(/\s+/g,"")))lookupPedido()});
+$("kCode").addEventListener("change",lookupPedido);
+$("uPay").addEventListener("click",e=>{e.preventDefault();prefillPago({codigo:$("uCode").value.trim().toUpperCase()})});
+
+/* ---------- PDF ---------- */
+let lastDocNo="";
+function loadScript(src){return new Promise((ok,ko)=>{if(document.querySelector(`script[src="${src}"]`))return ok();const t=document.createElement("script");t.src=src;t.onload=ok;t.onerror=ko;document.head.appendChild(t)})}
+async function makePdf(el,name,fmt){
+  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+  const canvas=await window.html2canvas(el,{scale:2,backgroundColor:"#ffffff",useCORS:true,logging:false,onclone:d=>{d.documentElement.setAttribute("data-theme","light")}});
+  const {jsPDF}=window.jspdf,pdf=new jsPDF({unit:"mm",format:fmt==="ticket"?[80,Math.max(80,80*canvas.height/canvas.width)]:"letter",orientation:"portrait"});
+  const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight(),m=fmt==="ticket"?0:12,w=pw-2*m;
+  let h=canvas.height*w/canvas.width;const img=canvas.toDataURL("image/jpeg",.92);
+  if(h<=ph-2*m)pdf.addImage(img,"JPEG",m,m,w,h);
+  else{const sliceH=Math.floor(canvas.width*(ph-2*m)/w);for(let y=0,first=true;y<canvas.height;y+=sliceH,first=false){
+    const c=document.createElement("canvas");c.width=canvas.width;c.height=Math.min(sliceH,canvas.height-y);c.getContext("2d").drawImage(canvas,0,-y);
+    if(!first)pdf.addPage();pdf.addImage(c.toDataURL("image/jpeg",.92),"JPEG",m,m,w,c.height*w/canvas.width)}}
+  pdf.setProperties({title:name.replace(/\.pdf$/,""),author:"Cerquita"});
+  return new File([pdf.output("blob")],name,{type:"application/pdf"});
+}
+async function saveFile(file){
+  if(window.claude&&typeof window.claude.use==="function"){
+    let dl=null;try{dl=await window.claude.use("downloads")}catch(e){}
+    if(dl){try{await dl.save({filename:file.name,data:file});return "saved"}catch(e){return e&&e.code==="declined"?"declined":"error"}}
+  }
+  const u=URL.createObjectURL(file),a=document.createElement("a");a.href=u;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);return "saved"}
+async function downPdf(el,name,msg,fmt){msg.textContent="Generando PDF…";
+  let f;try{f=await makePdf(el,name,fmt)}catch(e){msg.textContent="No se pudo generar el PDF en este navegador.";return}
+  const r=await saveFile(f);msg.textContent=r==="saved"?"PDF descargado ✓ "+name:r==="declined"?"Descarga cancelada.":"No se pudo descargar el PDF aquí. Probá desde el navegador del teléfono o la computadora."}
+async function sendPdf(el,name,phone,text,msg,title,fmt){
+  msg.textContent="Generando PDF…";let file;
+  try{file=await makePdf(el,name,fmt)}catch(e){msg.textContent="No se pudo generar el PDF en este navegador.";return}
+  try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Cerquita · "+title,text:"Cerquita · "+title});
+      msg.textContent="PDF listo ✓ Si no lo enviaste, presioná de nuevo y elegí WhatsApp.";return}}
+  catch(e){if(e&&e.name==="AbortError"){msg.textContent="Envío cancelado.";return}}
+  const sv=await saveFile(file);const d=String(phone||"").replace(/\D/g,"");
+  const w=`https://wa.me/${d.length>=8?d:""}?text=${encodeURIComponent(text+"\n\n(Adjunto el PDF: "+name+")")}`;
+  msg.innerHTML="";msg.append(sv==="saved"?"Se descargó el PDF. ":"Primero descargá el PDF con el botón «Descargar PDF». ");const a=document.createElement("a");a.href=w;a.target="_blank";a.rel="noopener";a.style.cssText="color:var(--teal);font-weight:700";
+  a.textContent=d.length>=8?"Abrir el chat del cliente en WhatsApp":"Abrir WhatsApp";msg.append(a," y adjuntá el PDF con el clip.");
+}
+
+/* ---------- Panel de pedidos ---------- */
+async function api(body){if(!API_URL)throw new Error("sin-api");
+  const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)});return r.json()}
+const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let pKey=lsGet("cerquita-key",""),orders=[],pFilter="nuevos",known=null,pTimer=null,baseTitle=document.title;
+const seen=new Set(lsGet("cerquita-seen",[]));
+const ACTIVOS=["Cotización","Pago","Compras","Despacho"];
+function isNew(o){return o.estado==="Solicitud"}
+function beep(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const c=new C(),o=c.createOscillator(),g=c.createGain();
+  o.type="sine";o.frequency.value=880;g.gain.setValueAtTime(.0001,c.currentTime);g.gain.exponentialRampToValueAtTime(.25,c.currentTime+.02);
+  g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+.6);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.65)}catch(e){}}
+function toast(t){$("toastTx").textContent=t;$("toast").classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>$("toast").classList.remove("on"),12000)}
+$("toastGo").addEventListener("click",()=>{$("toast").classList.remove("on");pFilter="nuevos"});
+async function loadOrders(){
+  if(!API_URL||!pKey)return;
+  try{const r=await api({action:"listar",key:pKey});
+    if(!r||!r.ok){if(r&&r.error==="clave"){pKey="";lsSet("cerquita-key","");$("pLoginMsg").textContent="La clave no es correcta.";renderPanel()}return}
+    orders=r.pedidos||[];
+    const nuevos=orders.filter(isNew);
+    if(known){const recien=nuevos.filter(o=>!known.has(o.codigo));
+      if(recien.length){const t=recien.length===1?`Nuevo pedido ${recien[0].codigo} de ${recien[0].cliente}`:`${recien.length} pedidos nuevos`;
+        toast(t);beep();try{if("Notification"in window&&Notification.permission==="granted")new Notification("Cerquita",{body:t})}catch(e){}}}
+    known=new Set(orders.map(o=>o.codigo));
+    document.title=nuevos.length?`(${nuevos.length}) Nuevos pedidos · Cerquita`:baseTitle;
+    $("pStatus").textContent="Actualizado a las "+new Date().toLocaleTimeString("es-NI",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+    if(document.body.dataset.view==="panel")renderPanel();
+  }catch(e){$("pStatus").textContent="No se pudo conectar con la hoja de pedidos. Reintentando…"}
+}
+function startPolling(){clearInterval(pTimer);if(API_URL&&pKey){loadOrders();pTimer=setInterval(loadOrders,30000)}}
+function renderPanel(){
+  const logged=!!(API_URL&&pKey);
+  $("pLogin").style.display=logged?"none":"block";$("pMain").style.display=logged?"block":"none";
+  if(!API_URL){$("pLogin").innerHTML=`<div class="kpi" style="margin-top:8px"><b style="font-size:18px">Hoja de pedidos pendiente de conexión</b><span>Cuando se conecte el receptor de Google, aquí aparecerán los pedidos con aviso de cada pedido nuevo. Mientras tanto, los pedidos llegan por WhatsApp al +505 8707 2125.</span></div>`;return}
+  if(!logged)return;
+  $("kNew").textContent=orders.filter(isNew).length;$("kAct").textContent=orders.filter(o=>ACTIVOS.includes(o.estado)).length;
+  $("kDone").textContent=orders.filter(o=>o.estado==="Entregado").length;
+  document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.f===pFilter));
+  const list=orders.filter(o=>pFilter==="nuevos"?isNew(o):pFilter==="activos"?ACTIVOS.includes(o.estado):true);
+  if(!list.length){$("pList").innerHTML=`<p class="hint">${pFilter==="nuevos"?"No hay pedidos nuevos por aceptar.":"No hay pedidos en esta vista."}</p>`;return}
+  const row=(l,v)=>v?`<dt>${l}</dt><dd>${esc(v)}</dd>`:"";
+  const digits=t=>String(t||"").replace(/\D/g,"");
+  $("pList").innerHTML=list.map(o=>{const nw=isNew(o)&&!seen.has(o.codigo);
+    const loc=/^https:\/\//.test(o.ubicacion)?`<dt>Ubicación</dt><dd><a href="${esc(o.ubicacion)}" target="_blank" rel="noopener" style="color:var(--teal);font-weight:600">Abrir en el mapa ↗</a></dd>`:"";
+    return `<details class="ocard ${nw?"isnew":""}" data-c="${esc(o.codigo)}"><summary><span class="oc">${esc(o.codigo)}</span>
+      <span class="chipst ${esc(o.estado)}">${esc(o.estado)}</span>${nw?`<span class="nbadge">NUEVO</span>`:""}
+      <span class="who">${esc(o.cliente)} → ${esc(o.beneficiario)} · ${esc(o.barrio)}</span><span class="hint">${esc(o.fecha)}</span></summary>
+      <div class="obody"><dl>${row("Cliente",o.cliente+(o.pais?" ("+o.pais+")":""))}${row("WhatsApp cliente",o.whatsapp)}${row("Correo",o.correo)}
+      ${row("Beneficiario",o.beneficiario+(o.parentesco?" ("+o.parentesco+")":""))}${row("Teléfono",o.telBeneficiario)}
+      ${row("Zona",[o.barrio,o.distrito].filter(Boolean).join(", "))}${row("Dirección",o.direccion)}${loc}
+      ${row("Tipo de pedido",o.tipo)}${row("Artículos",o.articulos)}${row("Indicaciones",o.indicaciones)}${row("Presupuesto",o.presupuesto)}
+      ${row("Fecha y horario",[o.fechaDeseada,o.horario].filter(Boolean).join(" · "))}${row("Vehículo",o.vehiculo)}${row("Tarjeta",o.tarjeta)}${row("PIN",o.pin)}
+      ${row("Aceptado",o.fechaAceptacion?o.fechaAceptacion+" · "+o.aceptadoPor:"")}${row("Total cotizado",o.total?o.moneda+" "+o.total:"")}</dl>
+      <div class="oact">${isNew(o)?`<button type="button" class="btn main" data-acc="${esc(o.codigo)}">Gestionar y aceptar</button>`:""}${o.estado==="Cotización"?`<button type="button" class="btn main" data-pay="${esc(o.codigo)}">Registrar pago</button>`:""}
+      <select aria-label="Cambiar estado" data-st="${esc(o.codigo)}">${["Solicitud","Cotización","Pago","Compras","Despacho","Entregado","Cancelado"].map(x=>`<option ${x===o.estado?"selected":""}>${x}</option>`).join("")}</select>
+      ${digits(o.whatsapp).length>=8?`<a class="btn sec" href="https://wa.me/${digits(o.whatsapp)}" target="_blank" rel="noopener">Escribir al cliente</a>`:""}</div></div></details>`}).join("");
+}
+$("pList").addEventListener("toggle",e=>{const d=e.target;if(d.open&&d.dataset.c){seen.add(d.dataset.c);lsSet("cerquita-seen",[...seen].slice(-500));d.classList.remove("isnew");const b=d.querySelector(".nbadge");if(b)b.remove()}},true);
+$("pList").addEventListener("click",e=>{const pb=e.target.closest("[data-pay]");if(pb){const o=orders.find(x=>x.codigo===pb.dataset.pay);if(o)prefillPago(o);return}
+  const b=e.target.closest("[data-acc]");if(!b)return;const o=orders.find(x=>x.codigo===b.dataset.acc);if(!o)return;
+  seen.add(o.codigo);lsSet("cerquita-seen",[...seen]);storeOrder(o.codigo,o);
+  $("h").reset();$("docWrap").style.display="none";$("h").style.display="";
+  $("aRaw").value="";$("aCode").value=o.codigo;$("aClient").value=o.cliente;$("aCountry").value=o.pais;$("aBenef").value=o.beneficiario;$("aDesc").value=o.articulos;$("aWa").value=o.whatsapp||"";
+  if(o.fechaDeseada)$("aDate").value=o.fechaDeseada;aCalc();location.hash="#aceptar";
+  setTimeout(()=>{$("aProd").focus()},300)});
+$("pList").addEventListener("change",async e=>{const sel=e.target.closest("[data-st]");if(!sel)return;const st=sel.value,c=sel.dataset.st;
+  $("pStatus").textContent=`Guardando estado de ${c}…`;
+  try{const r=await api({action:"estado",key:pKey,codigo:c,estado:st});$("pStatus").textContent=r&&r.ok?`Estado de ${c} actualizado a «${st}» ✓`:"No se pudo guardar el estado.";if(r&&r.ok){const o=orders.find(x=>x.codigo===c);if(o)o.estado=st;renderPanel()}}
+  catch(err){$("pStatus").textContent="No se pudo guardar el estado. Revisá tu conexión."}});
+document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{pFilter=b.dataset.f;renderPanel()}));
+$("pEnter").addEventListener("click",async()=>{const k=$("pKeyIn").value.trim();if(!k)return;
+  if(!API_URL){renderPanel();return}
+  $("pLoginMsg").textContent="Verificando…";
+  try{const r=await api({action:"listar",key:k});if(r&&r.ok){pKey=k;lsSet("cerquita-key",k);$("pLoginMsg").textContent="";orders=r.pedidos||[];known=new Set(orders.map(o=>o.codigo));renderPanel();startPolling()}
+    else $("pLoginMsg").textContent=r&&r.error==="clave"?"La clave no es correcta.":"No se pudo entrar."}
+  catch(e){$("pLoginMsg").textContent="No se pudo conectar con la hoja de pedidos."}});
+$("pKeyIn").addEventListener("keydown",e=>{if(e.key==="Enter")$("pEnter").click()});
+$("pRefresh").addEventListener("click",loadOrders);
+$("pOut").addEventListener("click",()=>{pKey="";lsSet("cerquita-key","");clearInterval(pTimer);orders=[];known=null;document.title=baseTitle;renderPanel()});
+$("pAlerts").addEventListener("click",async()=>{beep();
+  try{if(!("Notification"in window)){$("pStatus").textContent="Este navegador no permite notificaciones; las alertas sonarán y aparecerán en pantalla.";return}
+    const p=await Notification.requestPermission();$("pStatus").textContent=p==="granted"?"Alertas activadas ✓":"Las notificaciones quedaron bloqueadas; igual verás el aviso en pantalla."}
+  catch(e){$("pStatus").textContent="Las alertas aparecerán en pantalla."}});
+startPolling();
+
+async function sha(t){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
+function unlocked(){return lsGet("cerquita-team","")===TEAM_HASH}
+function lock(){lsSet("cerquita-team","");pKey="";lsSet("cerquita-key","");clearInterval(pTimer);orders=[];known=null;document.body.classList.add("locked");$("gKey").value="";setTimeout(()=>$("gKey").focus(),50)}
+async function tryUnlock(){const k=$("gKey").value.trim();if(!k)return;$("gMsg").textContent="";
+  let h="";try{h=await sha(k)}catch(e){$("gMsg").textContent="Este navegador no permite verificar la clave. Abrí la app desde su enlace https.";return}
+  if(h!==TEAM_HASH){$("gMsg").textContent="La clave no es correcta.";return}
+  lsSet("cerquita-team",h);pKey=k;lsSet("cerquita-key",k);document.body.classList.remove("locked");route();startPolling()}
+$("gGo").addEventListener("click",tryUnlock);$("gKey").addEventListener("keydown",e=>{if(e.key==="Enter")tryUnlock()});
+$("lockBtn").addEventListener("click",lock);
+if(!unlocked())lock();else document.body.classList.remove("locked");
+const VIEWS=["panel","aceptar","pago","avisos","entrega"];
+function route(){const h=location.hash.replace("#","");const v=VIEWS.includes(h)?h:"panel";document.body.dataset.view=v;
+  document.querySelectorAll(".tnav a").forEach(a=>a.toggleAttribute("aria-current",a.dataset.v===v)||a.removeAttribute("aria-current"));
+  document.querySelectorAll(".tnav a").forEach(a=>{if(a.dataset.v===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  if(v==="panel")renderPanel();window.scrollTo(0,0);
+  requestAnimationFrame(()=>{if(v==="entrega"&&!signed)sizeCv();if(v==="aceptar"&&!aPad.signed())aPad.resize();if(v==="pago"){if(!kPad.signed())kPad.resize();renderKSum()}})}
+window.addEventListener("hashchange",route);route();
+setInterval(()=>{const n=orders.filter(o=>o.estado==="Solicitud").length;$("navNew").textContent=n?String(n):""},2000);
+let deferredInstall=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;$("instBtn").classList.add("on")});
+$("instBtn").addEventListener("click",async()=>{if(deferredInstall){deferredInstall.prompt();deferredInstall=null;$("instBtn").classList.remove("on")}});
+
+if("serviceWorker" in navigator&&location.protocol==="https:"){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+}
+</script>
+</body>
+</html>
