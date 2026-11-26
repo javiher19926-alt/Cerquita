@@ -367,8 +367,8 @@ footer{padding-bottom:max(40px,env(safe-area-inset-bottom))}
   <button type="button" class="instbtn" id="instBtn">Instalar app</button>
 </div></header>
 <section class="hero vp"><div class="in hgrid"><div>
-  <h1>Tu familia en Managua, atendida como si estuvieras aquí.</h1>
-  <p>Contanos qué necesita tu familia: el súper, medicinas, un pastel, materiales para la casa o que alguien acompañe a tu mamá a su cita. Te mandamos la cotización, pagás por transferencia y te enviamos la prueba de cada entrega.</p>
+  <h1>Su familia en Managua, atendida como si usted estuviera aquí.</h1>
+  <p>Cuéntenos qué necesita su familia: el súper, medicinas, un pastel, materiales para la casa o que alguien acompañe a su mamá a una cita. Le enviamos la cotización, usted paga por transferencia y le enviamos la prueba de cada entrega.</p>
   <div class="row" style="margin-top:22px">
     <button type="button" class="btn main" data-open="dPedido">Hacer un pedido</button>
     <button type="button" class="btn ghost" data-open="dProceso">Conocer el proceso</button>
@@ -440,67 +440,67 @@ footer{padding-bottom:max(40px,env(safe-area-inset-bottom))}
     <div class="panel"><div class="ordergrid">
 <form id="f" novalidate>
   <fieldset>
-    <legend>Tus datos</legend>
-    <label><span>Tu nombre completo <span class="req">*</span></span><input id="sName" autocomplete="name" required></label>
-    <label><span>País donde vivís <span class="req">*</span></span>
-      <select id="sCountry" required><option value="">Elegí…</option><option>Costa Rica</option><option>Estados Unidos</option><option>España</option><option>Panamá</option><option>Canadá</option><option>Otro país</option></select></label>
-    <label><span>Tu WhatsApp con código de país <span class="req">*</span></span><input id="sPhone" type="tel" inputmode="tel" placeholder="+506 8888 8888" required></label>
+    <legend>Sus datos</legend>
+    <label><span>Su nombre completo <span class="req">*</span></span><input id="sName" autocomplete="name" required></label>
+    <label><span>País donde vive <span class="req">*</span></span>
+      <select id="sCountry" required><option value="">Elija…</option><option>Costa Rica</option><option>Estados Unidos</option><option>España</option><option>Panamá</option><option>Canadá</option><option>Otro país</option></select></label>
+    <label><span>Su WhatsApp con código de país <span class="req">*</span></span><input id="sPhone" type="tel" inputmode="tel" placeholder="+506 8888 8888" required></label>
     <label><span>Correo electrónico <span class="hint">(opcional)</span></span><input id="sMail" type="email" autocomplete="email"></label>
   </fieldset>
 
   <fieldset>
     <legend>¿Quién recibe en Managua?</legend>
-    <label><span>Nombre de tu familiar <span class="req">*</span></span><input id="rName" required></label>
+    <label><span>Nombre de su familiar <span class="req">*</span></span><input id="rName" required></label>
     <label>Parentesco<select id="rRel"><option>Mamá</option><option>Papá</option><option>Abuelo/a</option><option>Hijo/a</option><option>Hermano/a</option><option>Esposo/a</option><option>Otro familiar</option></select></label>
     <label><span>Teléfono del familiar <span class="req">*</span></span><input id="rPhone" type="tel" inputmode="tel" placeholder="8888 8888" required></label>
     <label>Distrito<select id="rDist"><option>Distrito I</option><option>Distrito II</option><option>Distrito III</option><option>Distrito IV</option><option>Distrito V</option><option>Distrito VI</option><option>Distrito VII</option><option>No sé</option></select></label>
     <label class="full"><span>Barrio o residencial <span class="req">*</span></span><input id="rBarrio" required></label>
     <label class="full"><span>Dirección con puntos de referencia <span class="req">*</span></span><textarea id="rAddr" placeholder="Ej.: del semáforo de la rotonda, 2 cuadras al lago, casa portón negro" required></textarea></label>
     <label class="full"><span>Ubicación en el mapa <span class="hint">(recomendado)</span></span>
-      <input id="rLoc" inputmode="url" placeholder="Pegá aquí el enlace de Google Maps o las coordenadas">
-      <span class="hint" id="locHint">Pedile a tu familiar que abra WhatsApp, toque el clip, elija «Ubicación» y te mande su ubicación actual. Abrila, tocá «Compartir» y pegá aquí el enlace.</span>
+      <input id="rLoc" inputmode="url" placeholder="Pegue aquí el enlace de Google Maps o las coordenadas">
+      <span class="hint" id="locHint">Pida a su familiar que abra WhatsApp, toque el clip, elija «Ubicación» y le envíe su ubicación actual. Ábrala, toque «Compartir» y pegue aquí el enlace.</span>
       <a id="locLink" href="#" target="_blank" rel="noopener" style="display:none;color:var(--teal);font-weight:600">Ver la ubicación en el mapa ↗</a>
     </label>
   </fieldset>
 
   <fieldset>
-    <legend>¿Qué necesita tu familia?</legend>
+    <legend>¿Qué necesita su familia?</legend>
     <div class="full chips" id="cats" role="group" aria-label="Tipo de pedido"></div>
     <div class="full items" id="items" aria-label="Lista de lo que necesitás"></div>
     <div class="full"><button type="button" class="btn sec" id="addItem">+ Agregar otra cosa</button></div>
-    <div class="full warn" id="warn" role="alert">Cerquita no compra ni entrega licores, cervezas ni ninguna sustancia prohibida. Quitá ese artículo para poder continuar.</div>
+    <div class="full warn" id="warn" role="alert">Cerquita no compra ni entrega licores, cervezas ni ninguna sustancia prohibida. Quite ese artículo para poder continuar.</div>
     <label><span>Presupuesto máximo <span class="hint">(opcional)</span></span><input id="budget" inputmode="decimal" placeholder="Ej.: US$80 o C$3,000"></label>
     <label>¿Para cuándo?<input id="date" type="date"></label>
     <label>Horario preferido<select id="slot"><option>Mañana (8–12)</option><option>Tarde (12–5)</option><option>Lo antes posible</option></select></label>
     <label>¿Repetir este pedido?<select id="rec"><option value="">No, solo esta vez</option><option value="15">Sí, cada 15 días</option><option value="30">Sí, cada mes</option></select></label>
     <label>Marcas o indicaciones especiales<input id="notes" placeholder="Ej.: leche sin lactosa, la receta va en foto"></label>
-    <label class="full"><span>Mensaje para tu familiar <span class="hint">(lo escribimos en una tarjeta)</span></span><textarea id="card" placeholder="Ej.: Feliz cumpleaños, mamá. Te quiero mucho."></textarea></label>
+    <label class="full"><span>Mensaje para su familiar <span class="hint">(lo escribimos en una tarjeta)</span></span><textarea id="card" placeholder="Ej.: Feliz cumpleaños, mamá. Te quiero mucho."></textarea></label>
   </fieldset>
 
   <fieldset>
     <legend>Cómo funciona el pago</legend>
-    <p class="full" style="margin:0">Primero revisamos tu pedido y te enviamos por WhatsApp la cotización con precios reales, costo de entrega y tarifa de servicio, junto con los datos de nuestra cuenta bancaria. Compramos solo cuando confirmamos tu transferencia. Te enviamos las facturas y la prueba de entrega.</p>
-    <label class="full check"><input type="checkbox" id="ok" required> Entiendo que mi pedido se compra después de aprobar la cotización y confirmar la transferencia, y que la entrega se hace solo a quien diga el código PIN.</label>
+    <p class="full" style="margin:0">Primero revisamos su pedido y le enviamos por WhatsApp la cotización con precios reales, costo de entrega y tarifa de servicio, junto con los datos de nuestra cuenta bancaria. Compramos solo cuando confirmamos su transferencia. Le enviamos las facturas y la prueba de entrega.</p>
+    <label class="full check"><input type="checkbox" id="ok" required> Entiendo que mi pedido se compra después de aprobar la cotización y confirmar la transferencia, que la entrega se hace solo a quien diga el código PIN, y acepto los <a href="privacidad.html#terminos" target="_blank" rel="noopener" style="color:var(--teal);font-weight:600">términos del servicio</a> y la <a href="privacidad.html" target="_blank" rel="noopener" style="color:var(--teal);font-weight:600">política de privacidad</a>.</label>
     <div class="full row" style="margin:0"><button type="submit" class="btn main">Generar mi pedido</button></div>
   </fieldset>
 </form>
 
 <aside>
   <div class="receipt" aria-live="polite">
-    <div class="hd"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7 12.5l3.2 3.2L17 9"/></svg>Tu pedido</div>
+    <div class="hd"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7 12.5l3.2 3.2L17 9"/></svg>Su pedido</div>
     <dl id="sum"></dl>
-    <div class="ft">Al entregar, tu familiar nos dice el PIN. Si no coincide, no entregamos.</div>
+    <div class="ft">Al entregar, su familiar nos dice el PIN. Si no coincide, no entregamos.</div>
   </div>
   <div class="done" id="done">
     <div class="hint">Número de pedido</div>
     <div class="code" id="oCode"></div>
-    <p style="margin:10px 0 0">Tu PIN de entrega es <b id="oPin" style="font-size:20px;color:var(--coral)"></b>. Dáselo solo a tu familiar. Él o ella lo dirá al recibir.</p>
+    <p style="margin:10px 0 0">Su PIN de entrega es <b id="oPin" style="font-size:20px;color:var(--coral)"></b>. Compártalo solo con su familiar. Él o ella lo dirá al recibir.</p>
     <div class="row">
       <a class="btn main" id="wa" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a>
       <button type="button" class="btn sec" id="copy">Copiar pedido</button>
     </div>
     <p class="hint" id="regMsg" style="margin:10px 0 0;color:var(--teal);font-weight:600" aria-live="polite"></p>
-    <p class="hint" id="copyMsg" style="margin:10px 0 0">Si WhatsApp no se abre, copiá el pedido y envialo al WhatsApp de Cerquita: <b style="white-space:nowrap">+505 8707 2125</b>.</p>
+    <p class="hint" id="copyMsg" style="margin:10px 0 0">Si WhatsApp no se abre, copie el pedido y envíelo al WhatsApp de Cerquita: <b style="white-space:nowrap">+505 8707 2125</b>.</p>
   </div>
 </aside>
 </div></div>
@@ -534,32 +534,32 @@ footer{padding-bottom:max(40px,env(safe-area-inset-bottom))}
     <summary><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-4.5"/></svg></span><span class="tx"><span class="tt">Compras de confianza</span><span class="ss">Cómo protegemos su dinero y garantizamos cada entrega</span></span><svg class="chev" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
     <div class="panel"><div class="tb-head">
     
-    <p>Una compra de confianza es la que hacés sin estar presente y aun así sabés, con pruebas, que tu dinero se usó exactamente en lo que pediste y que llegó a las manos correctas. En Cerquita no te pedimos que confiés en nosotros a ciegas: te damos cómo comprobarlo en cada paso.</p>
-    <p>Cuando mandás dinero a tu familia, no siempre sabés en qué se gastó, si alcanzó o si tu mamá tuvo que salir a hacer filas bajo el sol. Con una compra de confianza, vos decidís qué se compra, ves cuánto cuesta antes de pagar y recibís la prueba de que se entregó. Es la diferencia entre mandar dinero y mandar cuidado.</p>
+    <p>Una compra de confianza es la que usted hace sin estar presente y aun así sabe, con pruebas, que su dinero se usó exactamente en lo que pidió y que llegó a las manos correctas. En Cerquita no le pedimos que confíe en nosotros a ciegas: le damos cómo comprobarlo en cada paso.</p>
+    <p>Cuando envía dinero a su familia, no siempre sabe en qué se gastó, si alcanzó o si su mamá tuvo que salir a hacer filas bajo el sol. Con una compra de confianza, usted decide qué se compra, ve cuánto cuesta antes de pagar y recibe la prueba de que se entregó. Es la diferencia entre mandar dinero y mandar cuidado.</p>
   </div>
   <ol class="pillars">
-    <li><h3>Precio claro antes de pagar</h3><p>Contamos con tienda propia con productos a precios accesibles. Te mandamos una cotización detallada con el precio de cada producto, el costo de entrega y nuestra tarifa de servicio. Sin cargos escondidos ni sorpresas: si no estás de acuerdo, no pagás nada.</p></li>
-    <li><h3>Compramos solo lo que aprobaste</h3><p>Tu dinero se usa únicamente en lo que autorizaste. Si un producto no está disponible, te consultamos antes de cambiarlo por otro, y si sobra dinero, te lo devolvemos o lo dejamos como saldo a tu favor.</p></li>
-    <li><h3>Factura escaneada de cada compra</h3><p>Escaneamos cada factura, sea de nuestra tienda propia o de comercios aliados, y te la enviamos en formato digital con el detalle de cada producto y su precio. Así ves que lo cobrado es exactamente lo comprado.</p></li>
-    <li><h3>Entrega solo con tu PIN</h3><p>Cada pedido tiene un código secreto de cuatro dígitos que solo vos y tu familiar conocen. Si quien recibe no dice el PIN correcto, no entregamos.</p></li>
-    <li><h3>Prueba de que llegó</h3><p>Al entregar, tu familiar firma un recibí conforme y te mandamos un comprobante con foto, fecha, hora y firma. Lo ves llegar aunque estés a miles de kilómetros.</p></li>
-    <li><h3>Tu opinión cuenta</h3><p>Tu familiar califica cada entrega con estrellas. Así cuidamos la calidad del servicio y vos sabés cómo trataron a tu gente.</p></li>
+    <li><h3>Precio claro antes de pagar</h3><p>Contamos con tienda propia con productos a precios accesibles. Le enviamos una cotización detallada con el precio de cada producto, el costo de entrega y nuestra tarifa de servicio. Sin cargos escondidos ni sorpresas: si no está de acuerdo, no paga nada.</p></li>
+    <li><h3>Compramos solo lo que usted aprobó</h3><p>Su dinero se usa únicamente en lo que autorizó. Si un producto no está disponible, le consultamos antes de cambiarlo por otro, y si sobra dinero, se lo devolvemos o lo dejamos como saldo a su favor.</p></li>
+    <li><h3>Factura escaneada de cada compra</h3><p>Escaneamos cada factura, sea de nuestra tienda propia o de comercios aliados, y se la enviamos en formato digital con el detalle de cada producto y su precio. Así comprueba que lo cobrado es exactamente lo comprado.</p></li>
+    <li><h3>Entrega solo con su PIN</h3><p>Cada pedido tiene un código secreto de cuatro dígitos que solo usted y su familiar conocen. Si quien recibe no dice el PIN correcto, no entregamos.</p></li>
+    <li><h3>Prueba de que llegó</h3><p>Al entregar, su familiar firma un recibí conforme y le enviamos un comprobante con foto, fecha, hora y firma. Usted lo ve llegar aunque esté a miles de kilómetros.</p></li>
+    <li><h3>Su opinión cuenta</h3><p>Su familiar califica cada entrega con estrellas. Así cuidamos la calidad del servicio y usted sabe cómo trataron a los suyos.</p></li>
   </ol></div>
   </details>
 
   <details class="acc" id="dServicios" name="cq">
     <summary><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l1.5-5h13L20 9"/><path d="M5 9v11h14V9"/><path d="M10 20v-6h4v6"/></svg></span><span class="tx"><span class="tt">Tienda propia y servicios</span><span class="ss">Productos accesibles, cobertura y vehículos</span></span><svg class="chev" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
     <div class="panel"><div class="svc">
-  <div><h3>Tienda propia y mucho más</h3><p>Tenemos tienda propia con productos accesibles para la canasta del mes, y además resolvemos súper, medicinas, pasteles y regalos, pago de servicios, materiales de construcción, electrodomésticos, muebles, y acompañar a tu familiar a citas o trámites. Si lo necesita tu familia y es legal, lo resolvemos.</p></div>
-  <div><h3>Moto, carro o pickup</h3><p>Usamos el vehículo que pide tu encargo: moto para mandados rápidos, carro para compras grandes y acompañamiento, y pickup para materiales, muebles y electrodomésticos.</p></div>
+  <div><h3>Tienda propia y mucho más</h3><p>Tenemos tienda propia con productos accesibles para la canasta del mes, y además resolvemos súper, medicinas, pasteles y regalos, pago de servicios, materiales de construcción, electrodomésticos, muebles, y acompañar a su familiar a citas o trámites. Si lo necesita su familia y es legal, lo resolvemos.</p></div>
+  <div><h3>Moto, carro o pickup</h3><p>Usamos el vehículo que requiere su encargo: moto para mandados rápidos, carro para compras grandes y acompañamiento, y pickup para materiales, muebles y electrodomésticos.</p></div>
   <div><h3>Lo que no hacemos</h3><p>No compramos ni entregamos licores, cervezas ni sustancias prohibidas. Por ahora atendemos solo dentro de Managua.</p></div>
 </div></div>
   </details>
 </div>
-<footer>cerquita · Managua, Nicaragua · WhatsApp <a class="staff" href="https://wa.me/50587072125" target="_blank" rel="noopener" style="white-space:nowrap">+505 8707 2125</a></footer>
+<footer>cerquita · Managua, Nicaragua · <a class="staff" href="privacidad.html">Privacidad y términos</a> · WhatsApp <a class="staff" href="https://wa.me/50587072125" target="_blank" rel="noopener" style="white-space:nowrap">+505 8707 2125</a></footer>
 <div class="modal" id="iosModal" role="dialog" aria-modal="true" aria-labelledby="iosT"><div class="box">
-  <h3 id="iosT" style="font-size:20px">Instalar Cerquita en tu iPhone</h3>
-  <ol><li>Tocá el botón <b>Compartir</b> de Safari (el cuadro con la flecha hacia arriba).</li><li>Elegí <b>Agregar a pantalla de inicio</b>.</li><li>Tocá <b>Agregar</b>. Cerquita aparecerá como app en tu teléfono.</li></ol>
+  <h3 id="iosT" style="font-size:20px">Instalar Cerquita en su iPhone</h3>
+  <ol><li>Toque el botón <b>Compartir</b> de Safari (el cuadro con la flecha hacia arriba).</li><li>Elija <b>Agregar a pantalla de inicio</b>.</li><li>Toque <b>Agregar</b>. Cerquita aparecerá como app en su teléfono.</li></ol>
   <button type="button" class="btn main" id="iosClose" style="width:100%">Entendido</button></div></div>
 <script>
 {
@@ -617,8 +617,8 @@ function update(){
   $("locLink").style.display=lu?"inline":"none";if(lu)$("locLink").href=lu;
   $("rLoc").toggleAttribute("aria-invalid",lu===null);
   $("locHint").style.color=lu===null?"var(--coral)":"";
-  if(lu===null)$("locHint").textContent="Eso no parece un enlace de Google Maps ni coordenadas. Pegá el enlace que te comparte tu familiar.";
-  else $("locHint").textContent="Pedile a tu familiar que abra WhatsApp, toque el clip, elija «Ubicación» y te mande su ubicación actual. Abrila, tocá «Compartir» y pegá aquí el enlace.";
+  if(lu===null)$("locHint").textContent="Eso no parece un enlace de Google Maps ni coordenadas. Pegue el enlace que le comparte su familiar.";
+  else $("locHint").textContent="Pida a su familiar que abra WhatsApp, toque el clip, elija «Ubicación» y le envíe su ubicación actual. Ábrala, toque «Compartir» y pegue aquí el enlace.";
   const its=items(),cs=cats().map(c=>CATS.find(a=>a[0]===c)[1]);
   const rows=[["Envía",val("sName")||"—"],["Desde",val("sCountry")||"—"],["Recibe",val("rName")?`${val("rName")} (${val("rRel")})`:"—"],
     ["Zona",val("rBarrio")?`${val("rBarrio")}, ${val("rDist")}`:"—"],["Ubicación",lu?"En el mapa ✓":lu===null?"Enlace no válido":"Sin ubicación"],["Pedido",cs.join(", ")||"—"],["Artículos",its.length?its.length+" en la lista":"—"],
@@ -769,13 +769,13 @@ $("f").addEventListener("submit",e=>{
   $("done").classList.add("on");$("done").scrollIntoView({behavior:"smooth",block:"center"});
   const artTxt=items().map(i=>{const t=detTxt(i.x);return `• ${i.q?i.q+" × ":""}${i.d}${t?"\n   ↳ "+t:""}`}).join("\n");
   const reg=$("regMsg");
-  if(API_URL){reg.textContent="Registrando tu pedido en Cerquita…";
+  if(API_URL){reg.textContent="Registrando su pedido en Cerquita…";
     api({action:"nuevo",pedido:{codigo:code,cliente:val("sName"),pais:val("sCountry"),whatsapp:val("sPhone"),correo:val("sMail"),
       beneficiario:val("rName"),parentesco:val("rRel"),telBeneficiario:val("rPhone"),distrito:val("rDist"),barrio:val("rBarrio"),
       direccion:val("rAddr"),ubicacion:locUrl()||"",tipo:cs,articulos:artTxt,indicaciones:val("notes"),presupuesto:val("budget"),
       fechaDeseada:val("date"),horario:val("slot"),vehiculo:vehicle(),tarjeta:val("card"),pin,ck,recurrencia:val("rec")?(val("rec")==="15"?"Cada 15 días":"Cada mes"):""}})
-    .then(r=>{reg.textContent=r&&r.ok?"Tu pedido quedó registrado en Cerquita ✓ Envialo también por WhatsApp para atenderte más rápido.":"No pudimos registrarlo automáticamente. Envialo por WhatsApp."})
-    .catch(()=>{reg.textContent="No pudimos registrarlo automáticamente. Envialo por WhatsApp."});
+    .then(r=>{reg.textContent=r&&r.ok?"Su pedido quedó registrado en Cerquita ✓ Envíelo también por WhatsApp para atenderle más rápido.":"No pudimos registrarlo automáticamente. Envíelo por WhatsApp."})
+    .catch(()=>{reg.textContent="No pudimos registrarlo automáticamente. Envíelo por WhatsApp."});
   } else reg.textContent="";
 });
 /* ---------- Envío cifrado de pedidos ---------- */
@@ -815,8 +815,8 @@ function storeOrder(code,o){const m=lsGet("cerquita-orders",{});m[code]=Object.a
   const ks=Object.keys(m);if(ks.length>50)delete m[ks[0]];lsSet("cerquita-orders",m)}
 
 $("copy").addEventListener("click",async()=>{
-  try{await navigator.clipboard.writeText(lastText);$("copyMsg").textContent="Pedido copiado. Pegalo en el chat de WhatsApp con Cerquita."}
-  catch(e){$("copyMsg").textContent="No se pudo copiar automáticamente. Usá el botón de WhatsApp."}
+  try{await navigator.clipboard.writeText(lastText);$("copyMsg").textContent="Pedido copiado. Péguelo en el chat de WhatsApp con Cerquita."}
+  catch(e){$("copyMsg").textContent="No se pudo copiar automáticamente. Use el botón de WhatsApp."}
 });
 
 let deferredInstall=null;const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent),standalone=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone;
