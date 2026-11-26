@@ -211,9 +211,11 @@ body[data-view=pago] .vp{display:none}
 body[data-view=pago] #vPago{display:block}
 #vPago form{margin-top:20px}
 .vwrap{display:flex;justify-content:center;margin-top:24px}
-.voucher{width:340px;background:#fff;color:#0B2545;font:14px/1.45 Inter,sans-serif;padding:26px 22px 30px;position:relative;box-shadow:0 14px 40px rgba(11,37,69,.16);
-  -webkit-mask:radial-gradient(circle 7px at 50% 0,#0000 98%,#000) 50% 0/18px 100% repeat-x,linear-gradient(#000,#000) 0 7px/100% calc(100% - 14px) no-repeat,radial-gradient(circle 7px at 50% 100%,#0000 98%,#000) 50% 100%/18px 100% repeat-x;
-  mask:radial-gradient(circle 7px at 50% 0,#0000 98%,#000) 50% 0/18px 100% repeat-x,linear-gradient(#000,#000) 0 7px/100% calc(100% - 14px) no-repeat,radial-gradient(circle 7px at 50% 100%,#0000 98%,#000) 50% 100%/18px 100% repeat-x}
+.voucher{width:340px;color:#0B2545;font:14px/1.45 Inter,sans-serif;padding:26px 22px 30px;position:relative;
+  background:linear-gradient(180deg,rgba(11,37,69,.06) 0,rgba(11,37,69,0) 7px),repeating-linear-gradient(0deg,rgba(11,37,69,.014) 0 1px,rgba(0,0,0,0) 1px 3px),linear-gradient(180deg,#FFFFFF 0%,#FCFBF7 60%,#F8F6F0 100%);
+  box-shadow:0 1px 2px rgba(11,37,69,.10),0 12px 28px rgba(11,37,69,.16);border-radius:2px 2px 0 0}
+.voucher .tear{position:absolute;left:0;bottom:-12px;width:100%;height:13px;display:block}
+.vwrap{padding-bottom:16px}
 .voucher .vh{text-align:center}
 .voucher .vh .bn{font:700 24px Sora,sans-serif;letter-spacing:-.5px}
 .voucher .vh small{display:block;color:#4A5D75;font-size:12px}
@@ -2014,10 +2016,15 @@ module.exports = QRCode;
 
 return module.exports})();
 return {QRCode:M['./index'],ECL:M['./QRErrorCorrectLevel']}})();
+/* Borde inferior con el corte dentado de la impresora térmica */
+let _tear="";function tearHtml(){if(!_tear){const W=680,H=26,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
+    const zig=(dy,f)=>{x.beginPath();x.moveTo(0,0);for(let i=0;i<W;i+=28){x.lineTo(i+14,18+dy);x.lineTo(i+28,0)}x.closePath();x.fillStyle=f;x.fill()};
+    zig(4,"rgba(11,37,69,.06)");zig(2,"rgba(11,37,69,.10)");zig(0,"#F8F6F0");_tear=c.toDataURL("image/png")}
+  return `<img class="tear" src="${_tear}" width="340" height="13" alt="">`}
 /* Dibuja un código QR (imagen PNG nítida) con el texto indicado en UTF-8 */
 function qrSvg(text,px){const q=new QRLib.QRCode(-1,QRLib.ECL.L);q.addData(unescape(encodeURIComponent(text)));q.make();
   const n=q.getModuleCount(),b=4,N=n+2*b,u=Math.max(1,Math.round(px/N)),k=u*2,c=document.createElement("canvas");px=u*N;c.width=c.height=N*k;const x=c.getContext("2d");
-  x.fillStyle="#fff";x.fillRect(0,0,N*k,N*k);x.fillStyle="#0B2545";
+  x.fillStyle="#0B2545";
   for(let r=0;r<n;r++)for(let col=0;col<n;col++)if(q.isDark(r,col))x.fillRect((col+b)*k,(r+b)*k,k,k);
   return `<img class="qr" src="${c.toDataURL("image/png")}" width="${px}" height="${px}" alt="Código QR con los datos del comprobante">`}
 
@@ -2100,7 +2107,7 @@ $("g").addEventListener("submit",async e=>{
       `PIN de seguridad: verificado`,`Calificación: ${stars} (${rate}/5)`,com?`Comentario: ${com}`:"",`Fotos de evidencia: ${photos.length}`,`Verificación: ${ver}`,`WhatsApp +505 8707 2125`].filter(Boolean).join("\n"),117)}
     <div class="qrc">Escanee el código para ver los datos de la entrega</div><div class="code">${esc(ver)}</div>
     <p class="fine">Comprobante emitido electrónicamente al momento de la entrega. La firma, la cédula y el PIN confirman que el pedido fue recibido completo y en buen estado.</p>
-    <div class="sg">Lo pedís desde lejos. Lo ves llegar.</div>`;
+    <div class="sg">Lo pedís desde lejos. Lo ves llegar.</div>`+tearHtml();
   proofText=[`*Cerquita · Entrega verificada ✓*`,`Paso 6 de 6 · Pedido completado`,`Pedido: ${code}`,`Recibí conforme: ${name}`,`Cédula: ${maskCed(ced)}`,`Fecha y hora: ${when}`,
     `PIN: verificado`,`Calificación: ${stars} (${rate}/5)`,com?`Comentario: "${com}"`:"",``,`¡Gracias por confiar en Cerquita! La distancia se mide en kilómetros, pero el cariño se entrega en persona.`].filter(Boolean).join("\n");
   if(API_URL&&pKey)api({action:"estado",key:pKey,codigo:code,estado:"Entregado",extra:{calificacion:+rate,recibio:name,fechaEntrega:when}}).then(r=>{if(r&&r.ok)loadOrders()}).catch(()=>{});
@@ -2322,7 +2329,7 @@ $("k").addEventListener("submit",e=>{
       `Estado: ${partial?"Pago parcial recibido":"Pago confirmado"}`,`Confirmado por: ${$("kName").value.trim()}`,`Verificación: ${ver}`,`WhatsApp +505 8707 2125`].filter(Boolean).join("\n"),117)}
     <div class="qrc">Escanee el código para ver los datos del pago</div><div class="code">${esc(ver)}</div>
     <div style="text-align:center;font:700 12px Sora,sans-serif;letter-spacing:.3px;margin-top:12px;padding:8px;border:1.5px solid #0B2545;border-radius:6px">DOCUMENTO ELECTRÓNICO VÁLIDO SIN FIRMA NI SELLO</div>
-    <p class="fine">Comprobante emitido electrónicamente por Cerquita. Por su carácter electrónico no requiere firma autógrafa ni sello; su autenticidad se verifica con el código impreso. Confirma la recepción del pago y no sustituye el comprobante emitido por su banco. Consérvelo como respaldo de su pedido.</p>`;
+    <p class="fine">Comprobante emitido electrónicamente por Cerquita. Por su carácter electrónico no requiere firma autógrafa ni sello; su autenticidad se verifica con el código impreso. Confirma la recepción del pago y no sustituye el comprobante emitido por su banco. Consérvelo como respaldo de su pedido.</p>`+tearHtml();
   rText=[`*Cerquita · Recibo oficial de pago*`,`Recibo N.º ${no} · Pedido ${code}`,`Paso 3 de 6 · Pago confirmado ✓`,``,`Recibimos de ${$("kClient").value.trim()} la cantidad de ${m} (${words}).`,`Referencia: ${$("kRef").value.trim()}`,`Emitido el ${fecha} a las ${hora}.`,``,`Lo que sigue: paso 4, preparamos tu pedido y te enviamos la factura escaneada.`].join("\n");
   $("k").style.display="none";$("kOut").style.display="block";$("rMsg").textContent="";$("vMsg").textContent="";
   $("kOut").scrollIntoView({behavior:"smooth",block:"start"});
@@ -2393,9 +2400,12 @@ function loadScript(src){return new Promise((ok,ko)=>{if(document.querySelector(
 async function makePdf(el,name,fmt){
   await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
   await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
-  const W=fmt==="ticket"?340:760;
-  const canvas=await window.html2canvas(el,{scale:2,backgroundColor:"#ffffff",useCORS:true,logging:false,windowWidth:1200,
-    onclone:d=>{d.documentElement.setAttribute("data-theme","light");const c=d.getElementById(el.id);if(c){c.style.width=W+"px";c.style.maxWidth="none";c.style.margin="0";if(fmt!=="ticket")c.classList.add("pdfmode")}}});
+  const W=fmt==="ticket"?340:760,wrap=fmt==="ticket"&&el.parentElement&&el.parentElement.classList.contains("vwrap");
+  if(wrap&&!el.parentElement.id)el.parentElement.id=el.id+"Paper";
+  const target=wrap?el.parentElement:el,bg=wrap?"#E8ECF1":"#ffffff";
+  const canvas=await window.html2canvas(target,{scale:2,backgroundColor:bg,useCORS:true,logging:false,windowWidth:1200,
+    onclone:d=>{d.documentElement.setAttribute("data-theme","light");const c=d.getElementById(el.id);if(c){c.style.width=W+"px";c.style.maxWidth="none";c.style.margin="0";if(fmt!=="ticket")c.classList.add("pdfmode")}
+      if(wrap){const w=d.getElementById(target.id);w.style.cssText="display:block;width:"+(W+40)+"px;padding:20px 20px 34px;margin:0;background:"+bg}}});
   const {jsPDF}=window.jspdf,pdf=new jsPDF({unit:"mm",format:fmt==="ticket"?[80,Math.max(80,80*canvas.height/canvas.width)]:"letter",orientation:"portrait"});
   const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight(),m=fmt==="ticket"?0:12,w=pw-2*m;
   const img=canvas.toDataURL("image/jpeg",.92),maxH=ph-2*m;let iw=w,ih=canvas.height*w/canvas.width;
