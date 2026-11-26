@@ -274,6 +274,15 @@ body[data-view=aceptar] #vAceptar{display:block}
 .doc.pdfmode ol{font-size:12px;line-height:1.45;margin-bottom:10px}.doc.pdfmode ol li{margin-bottom:3px}
 .doc.pdfmode .ts{padding-top:10px}.doc.pdfmode .sigb img{height:70px}.doc.pdfmode .stamp{width:110px;height:110px;font-size:15px}
 .doc.pdfmode .df{padding:8px 24px;font-size:11px}
+.vh-input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+label.btn{cursor:pointer;flex-direction:row;flex:1 1 150px;font-weight:600}label.btn.off{opacity:.45;pointer-events:none}
+.phgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.phgrid:empty{display:none}
+.phgrid figure{margin:0;position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);aspect-ratio:4/3;background:#000}
+.phgrid img{width:100%;height:100%;object-fit:cover;display:block}
+.phgrid button{position:absolute;top:6px;right:6px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(11,37,69,.8);color:#fff;font-size:20px;cursor:pointer}
+.proof .phs{display:grid;gap:4px}.proof .phs.n2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.proof .phs img{width:100%;height:260px;object-fit:cover;display:block}.proof .phs.n2 img{height:200px}
 .doc h4{font:700 13px Sora,sans-serif;letter-spacing:.4px;color:#0E8A82;margin:18px 0 2px;padding-bottom:6px;border-bottom:2px solid #0B2545}
 .doc .neg{color:#B3261E}
 .doc td{padding:8px 0;border-bottom:1px solid #E6EBF1;vertical-align:top}

@@ -274,6 +274,15 @@ body[data-view=aceptar] #vAceptar{display:block}
 .doc.pdfmode ol{font-size:12px;line-height:1.45;margin-bottom:10px}.doc.pdfmode ol li{margin-bottom:3px}
 .doc.pdfmode .ts{padding-top:10px}.doc.pdfmode .sigb img{height:70px}.doc.pdfmode .stamp{width:110px;height:110px;font-size:15px}
 .doc.pdfmode .df{padding:8px 24px;font-size:11px}
+.vh-input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+label.btn{cursor:pointer;flex-direction:row;flex:1 1 150px;font-weight:600}label.btn.off{opacity:.45;pointer-events:none}
+.phgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.phgrid:empty{display:none}
+.phgrid figure{margin:0;position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);aspect-ratio:4/3;background:#000}
+.phgrid img{width:100%;height:100%;object-fit:cover;display:block}
+.phgrid button{position:absolute;top:6px;right:6px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(11,37,69,.8);color:#fff;font-size:20px;cursor:pointer}
+.proof .phs{display:grid;gap:4px}.proof .phs.n2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.proof .phs img{width:100%;height:260px;object-fit:cover;display:block}.proof .phs.n2 img{height:200px}
 .doc h4{font:700 13px Sora,sans-serif;letter-spacing:.4px;color:#0E8A82;margin:18px 0 2px;padding-bottom:6px;border-bottom:2px solid #0B2545}
 .doc .neg{color:#B3261E}
 .doc td{padding:8px 0;border-bottom:1px solid #E6EBF1;vertical-align:top}
@@ -369,8 +378,17 @@ body.locked #gate{display:flex}
     </fieldset>
     <fieldset>
       <legend>Foto de la entrega</legend>
-      <label class="full"><span>Foto del familiar con el pedido <span class="hint">(recomendado)</span></span><input id="dPhoto" type="file" accept="image/*"></label>
-      <img id="dPrev" alt="Vista previa de la foto de entrega" style="display:none;width:100%;max-height:240px;object-fit:cover;border-radius:12px" class="full">
+      <div class="full" style="display:flex;flex-direction:column;gap:10px">
+        <span style="font-weight:500;font-size:15px">Fotos del familiar con el pedido <span class="hint">(una o dos, recomendado)</span></span>
+        <div class="row" style="margin:0">
+          <label class="btn main" for="dCam" id="dCamBtn" role="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>Tomar foto</label>
+          <label class="btn sec" for="dGal" id="dGalBtn" role="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>Elegir de la galería</label>
+        </div>
+        <input id="dCam" class="vh-input" type="file" accept="image/*" capture="environment">
+        <input id="dGal" class="vh-input" type="file" accept="image/*" multiple>
+        <div class="phgrid" id="dPhotos" aria-live="polite"></div>
+        <p class="hint" id="dPhMsg" style="margin:0"></p>
+      </div>
     </fieldset>
     <fieldset>
       <legend>Recibí conforme</legend>
@@ -651,7 +669,7 @@ async function api(body){
   if(body.action==="estado")return teamUpdate(body.codigo,body.estado);
   return {ok:false,error:"accion"}}
 /* ---------- Registro de entrega ---------- */
-const cv=$("sig"),ctx=cv.getContext("2d");let drawing=false,signed=false,photoURL="",proofText="";
+const cv=$("sig"),ctx=cv.getContext("2d");let drawing=false,signed=false,photos=[],proofText="";
 function sizeCv(){const r=cv.getBoundingClientRect();if(!r.width)return;const d=window.devicePixelRatio||1;
   cv.width=Math.round(r.width*d);cv.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0);
   ctx.lineWidth=4;ctx.lineCap="round";ctx.lineJoin="round";ctx.strokeStyle="#1546D8";signed=false}
@@ -667,8 +685,16 @@ function pinCheck(){const a=$("dPinA").value.trim(),b=$("dPinB").value.trim(),m=
   m.textContent="";return false}
 $("dPinA").addEventListener("input",pinCheck);$("dPinB").addEventListener("input",pinCheck);
 
-$("dPhoto").addEventListener("change",()=>{const f=$("dPhoto").files[0];if(photoURL)URL.revokeObjectURL(photoURL);
-  photoURL=f?URL.createObjectURL(f):"";$("dPrev").src=photoURL;$("dPrev").style.display=photoURL?"block":"none"});
+async function shrink(file){try{const bm=await createImageBitmap(file,{imageOrientation:"from-image"});const k=Math.min(1,1600/Math.max(bm.width,bm.height));
+    const c=document.createElement("canvas");c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext("2d").drawImage(bm,0,0,c.width,c.height);
+    const b=await new Promise(r=>c.toBlob(r,"image/jpeg",.85));return URL.createObjectURL(b||file)}catch(e){return URL.createObjectURL(file)}}
+function renderPhotos(){$("dPhotos").innerHTML=photos.map((u,i)=>`<figure><img src="${u}" alt="Foto de entrega ${i+1}"><button type="button" data-rm="${i}" aria-label="Quitar foto ${i+1}">×</button></figure>`).join("");
+  const full=photos.length>=2;["dCamBtn","dGalBtn"].forEach(id=>$(id).classList.toggle("off",full));
+  $("dPhMsg").textContent=photos.length?(full?"Ya tenés 2 fotos. Quitá una para cambiarla.":"Podés agregar una foto más."):""}
+async function addPhotos(list){for(const f of [...list]){if(photos.length>=2)break;if(!/^image\//.test(f.type))continue;photos.push(await shrink(f))}renderPhotos()}
+$("dCam").addEventListener("change",async()=>{await addPhotos($("dCam").files);$("dCam").value=""});
+$("dGal").addEventListener("change",async()=>{await addPhotos($("dGal").files);$("dGal").value=""});
+$("dPhotos").addEventListener("click",e=>{const b=e.target.closest("[data-rm]");if(!b)return;const i=+b.dataset.rm;URL.revokeObjectURL(photos[i]);photos.splice(i,1);renderPhotos()});
 
 const maskCed=c=>{const s=c.replace(/-/g,"").toUpperCase();return `${s.slice(0,3)}-******-${s.slice(9)}`};
 $("g").addEventListener("submit",e=>{
@@ -686,7 +712,7 @@ $("g").addEventListener("submit",e=>{
   const when=new Date().toLocaleString("es-NI",{dateStyle:"medium",timeStyle:"short"});
   const stars="★".repeat(rate)+"☆".repeat(5-rate),com=$("dCom").value.trim(),sigURL=cv.toDataURL("image/png");
   $("proof").innerHTML=`<div class="hd"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7 12.5l3.2 3.2L17 9"/></svg>Entrega verificada</div>`+
-    (photoURL?`<img class="photo" src="${photoURL}" alt="Foto de la entrega">`:"")+
+    (photos.length?`<div class="phs n${photos.length}">${photos.map((u,i)=>`<img src="${u}" alt="Foto de la entrega ${i+1}">`).join("")}</div>`:"")+
     `<dl><dt>Pedido</dt><dd>${esc(code)}</dd><dt>Recibí conforme</dt><dd>${esc(name)}</dd><dt>Cédula</dt><dd>${esc(maskCed(ced))}</dd>`+
     `<dt>Fecha y hora</dt><dd>${esc(when)}</dd><dt>PIN</dt><dd class="okc">Verificado ✓</dd><dt>Calificación</dt><dd><span class="starsv">${stars}</span> ${rate}/5</dd>`+
     (com?`<dt>Comentario</dt><dd>${esc(com)}</dd>`:"")+`</dl>`+
@@ -698,7 +724,7 @@ $("g").addEventListener("submit",e=>{
 });
 $("pCopy").addEventListener("click",()=>sendPdf($("proof"),"Comprobante-"+($("dCode").value.trim().toUpperCase()||"entrega")+".pdf",$("dWa").value,proofText,$("pMsg"),"Comprobante de entrega verificada"));
 $("pDown").addEventListener("click",()=>downPdf($("proof"),"Comprobante-"+($("dCode").value.trim().toUpperCase()||"entrega")+".pdf",$("pMsg")));
-$("pNew").addEventListener("click",()=>{$("g").reset();$("pinMsg").textContent="";$("dPrev").style.display="none";if(photoURL)URL.revokeObjectURL(photoURL);photoURL="";
+$("pNew").addEventListener("click",()=>{$("g").reset();$("pinMsg").textContent="";photos.forEach(u=>URL.revokeObjectURL(u));photos=[];renderPhotos();
   $("proofWrap").style.display="none";$("g").style.display="";sizeCv();window.scrollTo(0,0)});
 
 /* ---------- Aceptación formal ---------- */
