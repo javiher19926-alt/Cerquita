@@ -181,6 +181,15 @@ details[open].acc .chev{transform:rotate(180deg)}
 .mrow:focus-visible{outline:3px solid var(--teal)}.mrow.sel{border-color:var(--teal);background:light-dark(#E3F5F3,#123F45)}
 .mrow .mc{font:700 15px Sora,sans-serif}.mrow .mb{color:var(--mute);font-size:14px}.mrow .dots{grid-column:1/3;display:flex;gap:6px}.mrow .mt{grid-column:1/-1;font-size:12px;color:var(--mute)}
 .mrow .d{width:22px;height:6px;border-radius:3px;background:var(--line)}.mrow .d.ok{background:var(--teal)}.mrow .d.nx{background:var(--coral)}
+.mact{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 4px;font-size:13px;color:var(--mute)}
+.mact .btn{min-height:38px;padding:6px 12px;font-size:14px}.mact .due{color:var(--coral);font-weight:700}
+.fform{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media(max-width:700px){.fform{grid-template-columns:minmax(0,1fr)}}
+.flist{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.frow{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--field)}
+.frow .fact{display:flex;gap:6px}.frow .btn{min-height:38px;padding:6px 12px;font-size:14px}
+.fbanner{display:none;background:#0B2545;color:#F7F5F0;border-radius:16px;padding:14px 18px;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between}
+.fbanner.on{display:flex}.fbanner b{color:#7FD8CF}
 .trustband{background:var(--card);border-top:1px solid var(--line);padding:clamp(32px,5vw,64px) max(5vw,16px)}
 .trustband .in{max-width:1240px;margin:auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:40px;align-items:start}
 @media(max-width:900px){.trustband .in{grid-template-columns:minmax(0,1fr)}}
@@ -407,6 +416,7 @@ footer{padding-bottom:max(40px,env(safe-area-inset-bottom))}
 </div></section>
 
 <div class="menu vp">
+  <div id="fBanner" class="fbanner" aria-live="polite"></div>
   <div id="myOrder" class="mine" aria-live="polite"></div>
 
   <details class="acc" id="dPedido" name="cq">
@@ -446,6 +456,7 @@ footer{padding-bottom:max(40px,env(safe-area-inset-bottom))}
     <label><span>Presupuesto máximo <span class="hint">(opcional)</span></span><input id="budget" inputmode="decimal" placeholder="Ej.: US$80 o C$3,000"></label>
     <label>¿Para cuándo?<input id="date" type="date"></label>
     <label>Horario preferido<select id="slot"><option>Mañana (8–12)</option><option>Tarde (12–5)</option><option>Lo antes posible</option></select></label>
+    <label>¿Repetir este pedido?<select id="rec"><option value="">No, solo esta vez</option><option value="15">Sí, cada 15 días</option><option value="30">Sí, cada mes</option></select></label>
     <label>Marcas o indicaciones especiales<input id="notes" placeholder="Ej.: leche sin lactosa, la receta va en foto"></label>
     <label class="full"><span>Mensaje para tu familiar <span class="hint">(lo escribimos en una tarjeta)</span></span><textarea id="card" placeholder="Ej.: Feliz cumpleaños, mamá. Te quiero mucho."></textarea></label>
   </fieldset>
@@ -485,6 +496,21 @@ footer{padding-bottom:max(40px,env(safe-area-inset-bottom))}
       <p class="lead">Cada pedido sigue un proceso definido. Al concluir cada etapa le notificamos por WhatsApp el avance, indicando la etapa completada y la siguiente. Seleccione una etapa para ver su detalle.</p>
       <div class="stepper" id="stepper" role="tablist" aria-label="Etapas del proceso"></div>
       <div class="sdetail" id="stepDetail" role="tabpanel" aria-live="polite"></div>
+    </div>
+  </details>
+
+  <details class="acc" id="dFechas" name="cq">
+    <summary><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M12 14.5l1 2 2 .3-1.5 1.4.4 2.1-1.9-1-1.9 1 .4-2.1-1.5-1.4 2-.3z"/></svg></span><span class="tx"><span class="tt">Fechas especiales de mi familia</span><span class="ss">Cumpleaños y celebraciones, con recordatorio</span></span><svg class="chev" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
+    <div class="panel">
+      <p class="lead">Registre las fechas importantes de su familia. Le recordaremos con tiempo para que su detalle llegue el día exacto. Las fechas se guardan solo en su teléfono.</p>
+      <div class="fform">
+        <label><span>¿Para quién?</span><input id="fWho" placeholder="Ej.: Mamá"></label>
+        <label><span>Ocasión</span><select id="fOc"><option>Cumpleaños</option><option>Aniversario</option><option>Día de las Madres</option><option>Día del Padre</option><option>Graduación</option><option>Otra celebración</option></select></label>
+        <label><span>Fecha</span><input id="fDate" type="date"></label>
+        <button type="button" class="btn main" id="fAdd" style="align-self:end">Agregar fecha</button>
+      </div>
+      <p class="badc" id="fErr" style="margin:8px 0 0" aria-live="assertive"></p>
+      <div id="fList" class="flist"></div>
     </div>
   </details>
 
@@ -553,7 +579,7 @@ function numberItems(){[...$("items").children].forEach((r,i)=>{r.querySelector(
 $("addItem").addEventListener("click",()=>{addItem();$("items").lastChild.querySelector("input").focus()});
 $("items").addEventListener("click",e=>{if(e.target.matches(".icon-btn")){e.target.closest(".item").remove();if(!$("items").children.length)addItem();numberItems();update()}});
 
-const F=["sName","sCountry","sPhone","sMail","rName","rRel","rPhone","rDist","rBarrio","rAddr","rLoc","budget","date","slot","notes","card"];
+const F=["sName","sCountry","sPhone","sMail","rName","rRel","rPhone","rDist","rBarrio","rAddr","rLoc","budget","date","slot","rec","notes","card"];
 const val=id=>$(id).value.trim();
 const cats=()=>[...document.querySelectorAll("#cats input:checked")].map(i=>i.value);
 const items=()=>[...document.querySelectorAll(".item")].map(r=>{const o={d:r.querySelector(".iDesc").value.trim(),q:r.querySelector(".iQty").value.trim(),x:{}};
@@ -605,6 +631,36 @@ const cGet=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.par
 const cSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 (function migrate(){const last=cGet("cerquita-last",null),mis=cGet("cerquita-mis",[]);if(last&&last.code&&!mis.length){mis.push({code:last.code,at:Date.now(),estado:"Solicitud",t:0,hist:[]});cSet("cerquita-mis",mis)}})();
 const fmtAgo=t=>{if(!t)return "";const d=new Date(t*1000);return d.toLocaleString("es-NI",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})};
+const DAY=86400000;
+function recNext(o){const base=o.at||Date.now(),per=(+o.rec||0)*DAY;if(!per)return null;let n=base+per;while(n<Date.now()-DAY*3)n+=per;return n}
+function recDue(o){const n=recNext(o);return n&&Date.now()>=n-DAY}
+const fmtDay=ms=>ms?new Date(ms).toLocaleDateString("es-NI",{weekday:"long",day:"numeric",month:"long"}):"";
+function repeatOrder(i){const o=cGet("cerquita-mis",[])[i];if(!o||!o.snap)return;const d=o.snap;
+  F.forEach(k=>{if(d.f&&d.f[k]!=null)$(k).value=d.f[k]});$("date").value="";
+  document.querySelectorAll("#cats input").forEach(x=>{x.checked=(d.c||[]).includes(x.value)});
+  $("items").innerHTML="";(d.i||[]).forEach(x=>addItem(x.d,x.q,x.x||{}));if(!$("items").children.length)addItem();
+  $("ok").checked=false;$("done").classList.remove("on");update();
+  const dp=$("dPedido");dp.open=true;dp.scrollIntoView({behavior:"smooth",block:"start"})}
+function icsEsc(t){return String(t).replace(/[\;,]/g,m=>"\\"+m).replace(/\n/g,"\\n")}
+function icsDate(ms){const d=new Date(ms);return d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")}
+function downloadIcs(name,lines){const body=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Cerquita//ES","CALSCALE:GREGORIAN",...lines,"END:VCALENDAR"].join("\r\n");
+  const u=URL.createObjectURL(new Blob([body],{type:"text/calendar"})),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
+function icsEvent(uid,startMs,summary,desc,rrule,alarmDays){return ["BEGIN:VEVENT","UID:"+uid+"@cerquita","DTSTAMP:"+new Date().toISOString().replace(/[-:]/g,"").slice(0,15)+"Z",
+  "DTSTART;VALUE=DATE:"+icsDate(startMs),"SUMMARY:"+icsEsc(summary),"DESCRIPTION:"+icsEsc(desc),...(rrule?["RRULE:"+rrule]:[]),
+  "BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:"+icsEsc(summary),"TRIGGER:-P"+alarmDays+"D","END:VALARM","END:VEVENT"]}
+function icsRec(o){const n=recNext(o)||Date.now();
+  downloadIcs("cerquita-pedido-recurrente.ics",icsEvent("rec-"+o.code,n,"Pedido Cerquita para "+(o.benef||"mi familia"),"Hora de hacer el pedido recurrente en la app Cerquita: https://javiher19926-alt.github.io/Cerquita/",o.rec==="15"?"FREQ=WEEKLY;INTERVAL=2":"FREQ=MONTHLY",1))}
+/* Fechas especiales */
+function nextOcc(md){const [m,d]=md.split("-").map(Number),now=new Date(),y=now.getFullYear();let t=new Date(y,m-1,d);if(t<new Date(y,now.getMonth(),now.getDate()))t=new Date(y+1,m-1,d);return t.getTime()}
+function renderFechas(){const fs=cGet("cerquita-fechas",[]).map(f=>Object.assign({},f,{n:nextOcc(f.md)})).sort((a,b)=>a.n-b.n);
+  $("fList").innerHTML=fs.length?fs.map(f=>{const days=Math.round((f.n-new Date(new Date().toDateString()).getTime())/DAY);
+    return `<div class="frow"><div><b>${esc(f.oc)}</b> de ${esc(f.who)}<span class="hint"> · ${esc(fmtDay(f.n))}${days===0?" · ¡Hoy!":days<=15?" · en "+days+" día"+(days===1?"":"s"):""}</span></div>
+      <div class="fact"><button type="button" class="btn sec" data-fics="${esc(f.id)}">Al calendario</button><button type="button" class="icon-btn" data-fdel="${esc(f.id)}" aria-label="Quitar fecha">×</button></div></div>`}).join(""):`<p class="hint" style="margin:0">Aún no hay fechas registradas.</p>`;
+  const soon=fs.find(f=>f.n-Date.now()<=15*DAY),b=$("fBanner");
+  if(soon){const days=Math.max(0,Math.round((soon.n-new Date(new Date().toDateString()).getTime())/DAY));b.classList.add("on");
+    b.innerHTML=`<span>${days===0?"Hoy":"En "+days+" día"+(days===1?"":"s")} es el <b>${esc(soon.oc.toLowerCase())}</b> de <b>${esc(soon.who)}</b>. ¿Le mandamos algo especial?</span><button type="button" class="btn main" data-open="dPedido" id="fGo">Hacer un pedido</button>`;
+    $("fGo").onclick=()=>{const d=$("dPedido");d.open=true;d.scrollIntoView({behavior:"smooth",block:"start"})}}
+  else{b.classList.remove("on");b.innerHTML=""}}
 function renderMis(){const mis=cGet("cerquita-mis",[]),m=$("myOrder");
   if(!mis.length){m.classList.remove("on");m.innerHTML="";return}
   if(selOrd>=mis.length)selOrd=0;
@@ -615,10 +671,15 @@ function renderMis(){const mis=cGet("cerquita-mis",[]),m=$("myOrder");
       const dots=SHORT.map((_,j)=>`<span class="d ${j<=done?"ok":j===done+1&&o.estado!=="Cancelado"?"nx":""}" title="${SHORT[j]}"></span>`).join("");
       return `<button type="button" class="mrow ${i===selOrd?"sel":""}" data-o="${i}"><span class="mc">${esc(o.code)}</span><span class="mb">${o.benef?"Para "+esc(o.benef):""}</span>
         <span class="chipst ${esc(o.estado)}">${esc(o.estado==="Entregado"?"Entregado ✓":o.estado)}</span><span class="dots" aria-label="Etapa ${done+1} de 6">${dots}</span>
-        <span class="mt">${o.t?"Actualizado "+esc(fmtAgo(o.t)):""}${o.total?" · Total "+esc(o.total):""}</span></button>`}).join("");
+        <span class="mt">${o.t?"Actualizado "+esc(fmtAgo(o.t)):""}${o.total?" · Total "+esc(o.total):""}</span></button>`+
+        (o.snap?`<div class="mact">${o.rec?`<span class="${recDue(o)?"due":""}">${recDue(o)?"Ya toca su pedido recurrente":"Próximo pedido: "+esc(fmtDay(recNext(o)))}</span>`:""}
+          <button type="button" class="btn sec" data-again="${i}">Pedir de nuevo</button>${o.rec?`<button type="button" class="btn sec" data-ics="${i}">Recordatorio en calendario</button>`:""}</div>`:"")}).join("");
   const nb=$("misNotif");if(nb)nb.onclick=async()=>{try{await Notification.requestPermission()}catch(e){}renderMis()};
 }
-$("myOrder").addEventListener("click",e=>{const b=e.target.closest(".mrow");if(!b)return;selOrd=+b.dataset.o;selStep=null;renderSteps();const d=$("dProceso");if(d&&!d.open){d.open=true}d&&d.scrollIntoView({behavior:"smooth",block:"start"})});
+$("myOrder").addEventListener("click",e=>{
+  const ag=e.target.closest("[data-again]");if(ag){repeatOrder(+ag.dataset.again);return}
+  const ic=e.target.closest("[data-ics]");if(ic){const o=cGet("cerquita-mis",[])[+ic.dataset.ics];if(o)icsRec(o);return}
+  const b=e.target.closest(".mrow");if(!b)return;selOrd=+b.dataset.o;selStep=null;renderSteps();const d=$("dProceso");if(d&&!d.open){d.open=true}d&&d.scrollIntoView({behavior:"smooth",block:"start"})});
 function renderSteps(){
   const mis=cGet("cerquita-mis",[]),o=mis[selOrd]||null;
   const done=o?(o.estado in STG?STG[o.estado]:-1):-1,cur=o?Math.min(done+1,6):0;
@@ -646,6 +707,12 @@ async function clientSync(){if(syncBusy||typeof openFor!=="function")return;cons
       const o=changed[changed.length-1],msg={"Cotización":"Su pedido fue aceptado. Revise la constancia en WhatsApp.","Pago":"Confirmamos su pago. Ya estamos preparando su pedido.","Compras":"Estamos preparando su pedido.","Despacho":"Su pedido va en camino.","Entregado":"Su pedido fue entregado y verificado.","Cancelado":"Su pedido fue cancelado."}[o.estado]||"Su pedido avanzó.";
       try{if("Notification" in window&&Notification.permission==="granted")new Notification("Cerquita · "+o.code,{body:msg,icon:"icons/icon-192.png"})}catch(e){}}
   }catch(e){}finally{syncBusy=false}}
+$("fAdd").addEventListener("click",()=>{const who=$("fWho").value.trim(),oc=$("fOc").value,dt=$("fDate").value;
+  if(!who||!dt){$("fErr").textContent="Escriba para quién es y la fecha.";return}$("fErr").textContent="";
+  const fs=cGet("cerquita-fechas",[]);fs.push({id:Date.now().toString(36),who,oc,md:dt.slice(5)});cSet("cerquita-fechas",fs);$("fWho").value="";$("fDate").value="";renderFechas()});
+$("fList").addEventListener("click",e=>{const d=e.target.closest("[data-fdel]");if(d){cSet("cerquita-fechas",cGet("cerquita-fechas",[]).filter(f=>f.id!==d.dataset.fdel));renderFechas();return}
+  const c=e.target.closest("[data-fics]");if(c){const f=cGet("cerquita-fechas",[]).find(x=>x.id===c.dataset.fics);if(f)downloadIcs("cerquita-"+f.oc.toLowerCase().replace(/\s+/g,"-")+".ics",icsEvent("f-"+f.id,nextOcc(f.md),f.oc+" de "+f.who,"Envíe un detalle con Cerquita: https://javiher19926-alt.github.io/Cerquita/","FREQ=YEARLY",5))}});
+renderFechas();
 setTimeout(clientSync,1500);setInterval(()=>{if(document.visibilityState==="visible")clientSync()},60000);
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")clientSync()});
 renderSteps();
@@ -671,7 +738,7 @@ $("f").addEventListener("submit",e=>{
     `*Recibe:* ${val("rName")} (${val("rRel")}) · Tel. ${val("rPhone")}`,`${val("rBarrio")}, ${val("rDist")}, Managua`,`Dirección: ${val("rAddr")}`,`Ubicación: ${locUrl()||"no enviada (confirmar por teléfono)"}`,``,
     `*Tipo:* ${cs}`,`*Lista:*`,...items().map(i=>{const t=detTxt(i.x);return `• ${i.q?i.q+" × ":""}${i.d}${t?"\n   ↳ "+t:""}`}),
     val("notes")?`Indicaciones: ${val("notes")}`:"",val("budget")?`Presupuesto máximo: ${val("budget")}`:"",
-    `Entrega: ${val("date")||"por definir"} · ${val("slot")} · Vehículo sugerido: ${vehicle()}`,
+    `Entrega: ${val("date")||"por definir"} · ${val("slot")} · Vehículo sugerido: ${vehicle()}`,val("rec")?`*Pedido recurrente:* ${val("rec")==="15"?"cada 15 días":"cada mes"}`:"",
     val("card")?`Tarjeta: "${val("card")}"`:"",``,`*PIN de entrega:* ${pin} (uso interno de Cerquita para verificar)`].filter((l,i,a)=>l!==""||a[i-1]!=="").join("\n");
   storeOrder(code,{codigo:code,cliente:val("sName"),pais:val("sCountry"),whatsapp:val("sPhone"),correo:val("sMail"),beneficiario:val("rName"),parentesco:val("rRel"),
     telBeneficiario:val("rPhone"),distrito:val("rDist"),barrio:val("rBarrio"),direccion:val("rAddr"),ubicacion:locUrl()||"",tipo:cs,
@@ -679,7 +746,7 @@ $("f").addEventListener("submit",e=>{
     fechaDeseada:val("date"),horario:val("slot"),vehiculo:vehicle()});
   try{localStorage.setItem("cerquita-last",JSON.stringify({code,at:t.toLocaleString("es-NI",{dateStyle:"medium",timeStyle:"short"})}))}catch(e){}
   const ck=btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16)))).replace(/[+/=]/g,"");
-  {const mis=cGet("cerquita-mis",[]);mis.unshift({code,ck,benef:val("rName"),at:Date.now(),estado:"Solicitud",t:Math.floor(Date.now()/1000),hist:[{e:"Solicitud",t:Math.floor(Date.now()/1000)}]});cSet("cerquita-mis",mis.slice(0,20));selOrd=0;selStep=null}
+  {const mis=cGet("cerquita-mis",[]);mis.unshift({code,ck,benef:val("rName"),rec:val("rec"),snap:{f:Object.fromEntries(F.map(i=>[i,$(i).value])),c:cats(),i:items()},at:Date.now(),estado:"Solicitud",t:Math.floor(Date.now()/1000),hist:[{e:"Solicitud",t:Math.floor(Date.now()/1000)}]});cSet("cerquita-mis",mis.slice(0,20));selOrd=0;selStep=null}
   renderSteps();
   $("oCode").textContent=code;$("oPin").textContent=pin;
   $("wa").href=`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(lastText)}`;
@@ -690,7 +757,7 @@ $("f").addEventListener("submit",e=>{
     api({action:"nuevo",pedido:{codigo:code,cliente:val("sName"),pais:val("sCountry"),whatsapp:val("sPhone"),correo:val("sMail"),
       beneficiario:val("rName"),parentesco:val("rRel"),telBeneficiario:val("rPhone"),distrito:val("rDist"),barrio:val("rBarrio"),
       direccion:val("rAddr"),ubicacion:locUrl()||"",tipo:cs,articulos:artTxt,indicaciones:val("notes"),presupuesto:val("budget"),
-      fechaDeseada:val("date"),horario:val("slot"),vehiculo:vehicle(),tarjeta:val("card"),pin,ck}})
+      fechaDeseada:val("date"),horario:val("slot"),vehiculo:vehicle(),tarjeta:val("card"),pin,ck,recurrencia:val("rec")?(val("rec")==="15"?"Cada 15 días":"Cada mes"):""}})
     .then(r=>{reg.textContent=r&&r.ok?"Tu pedido quedó registrado en Cerquita ✓ Envialo también por WhatsApp para atenderte más rápido.":"No pudimos registrarlo automáticamente. Envialo por WhatsApp."})
     .catch(()=>{reg.textContent="No pudimos registrarlo automáticamente. Envialo por WhatsApp."});
   } else reg.textContent="";

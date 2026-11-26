@@ -181,6 +181,15 @@ details[open].acc .chev{transform:rotate(180deg)}
 .mrow:focus-visible{outline:3px solid var(--teal)}.mrow.sel{border-color:var(--teal);background:light-dark(#E3F5F3,#123F45)}
 .mrow .mc{font:700 15px Sora,sans-serif}.mrow .mb{color:var(--mute);font-size:14px}.mrow .dots{grid-column:1/3;display:flex;gap:6px}.mrow .mt{grid-column:1/-1;font-size:12px;color:var(--mute)}
 .mrow .d{width:22px;height:6px;border-radius:3px;background:var(--line)}.mrow .d.ok{background:var(--teal)}.mrow .d.nx{background:var(--coral)}
+.mact{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 4px;font-size:13px;color:var(--mute)}
+.mact .btn{min-height:38px;padding:6px 12px;font-size:14px}.mact .due{color:var(--coral);font-weight:700}
+.fform{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media(max-width:700px){.fform{grid-template-columns:minmax(0,1fr)}}
+.flist{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.frow{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--field)}
+.frow .fact{display:flex;gap:6px}.frow .btn{min-height:38px;padding:6px 12px;font-size:14px}
+.fbanner{display:none;background:#0B2545;color:#F7F5F0;border-radius:16px;padding:14px 18px;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between}
+.fbanner.on{display:flex}.fbanner b{color:#7FD8CF}
 .trustband{background:var(--card);border-top:1px solid var(--line);padding:clamp(32px,5vw,64px) max(5vw,16px)}
 .trustband .in{max-width:1240px;margin:auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:40px;align-items:start}
 @media(max-width:900px){.trustband .in{grid-template-columns:minmax(0,1fr)}}
@@ -1108,7 +1117,7 @@ function renderPanel(){
       ${row("Beneficiario",o.beneficiario+(o.parentesco?" ("+o.parentesco+")":""))}${row("Teléfono",o.telBeneficiario)}
       ${row("Zona",[o.barrio,o.distrito].filter(Boolean).join(", "))}${row("Dirección",o.direccion)}${loc}
       ${row("Tipo de pedido",o.tipo)}${row("Artículos",o.articulos)}${row("Indicaciones",o.indicaciones)}${row("Presupuesto",o.presupuesto)}
-      ${row("Fecha y horario",[o.fechaDeseada,o.horario].filter(Boolean).join(" · "))}${row("Vehículo",o.vehiculo)}${row("Tarjeta",o.tarjeta)}${row("PIN",o.pin)}
+      ${row("Fecha y horario",[o.fechaDeseada,o.horario].filter(Boolean).join(" · "))}${row("Recurrencia",o.recurrencia)}${row("Vehículo",o.vehiculo)}${row("Tarjeta",o.tarjeta)}${row("PIN",o.pin)}
       ${row("Aceptado",o.fechaAceptacion?o.fechaAceptacion+" · "+o.aceptadoPor:"")}${row("Total cotizado",o.total?o.moneda+" "+o.total:"")}</dl>
       <div class="oact">${isNew(o)?`<button type="button" class="btn main" data-acc="${esc(o.codigo)}">Gestionar y aceptar</button>`:""}${o.estado==="Cotización"?`<button type="button" class="btn main" data-pay="${esc(o.codigo)}">Registrar pago</button>`:""}
       <select aria-label="Cambiar estado" data-st="${esc(o.codigo)}">${["Solicitud","Cotización","Pago","Compras","Despacho","Entregado","Cancelado"].map(x=>`<option ${x===o.estado?"selected":""}>${x}</option>`).join("")}</select>
