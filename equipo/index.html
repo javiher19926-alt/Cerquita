@@ -346,6 +346,17 @@ body[data-view=entrega] #vEntrega{display:block}
 .proof .photo{width:100%;max-height:280px;object-fit:cover;display:block}
 .proof .sigimg{width:100%;max-height:120px;object-fit:contain;background:#fff;border-radius:10px;display:block}
 .proof .starsv{color:#F5B301;letter-spacing:2px}
+.dvou .ok{margin:8px 0 2px}
+.dvou .dph{display:flex;gap:4px;justify-content:center;margin:2px 0}.dvou .dph img{display:block;border-radius:8px;object-fit:cover}
+.dvou .cap{text-align:center;font-size:11px;color:#4A5D75;margin-top:6px}
+.dvou .ln span.stv{color:#F5B301;letter-spacing:1px}
+.dvou .ln span:last-child{font-variant-numeric:normal}
+.dvou .cm{font-style:italic;color:#4A5D75;text-align:center;margin:8px 4px 0;font-size:13px}
+.dvou .dsig{text-align:center;margin-top:14px}.dvou .dsig img{display:block;margin:0 auto -6px}
+.dvou .sl{border-top:1px solid #0B2545;margin:0 30px;padding-top:6px;font-weight:600;font-size:13px}.dvou .sl small{display:block;font-weight:400;color:#4A5D75;font-size:11px}
+.dvou .ty{text-align:center;font:500 13.5px/1.5 Inter,sans-serif;color:#0B2545;background:#F7F5F0;border-radius:12px;padding:14px 12px;margin:4px 0 10px}
+.dvou .ty b{display:block;font:700 16px Sora,sans-serif;color:#0E8A82;margin-bottom:4px}
+.dvou .sg{text-align:center;font:600 12px Sora,sans-serif;color:#0B2545;margin-top:10px;letter-spacing:.2px}
 .staff{color:var(--mute);text-decoration:underline}
 @media(prefers-reduced-motion:no-preference){.done.on{animation:pop .4s ease-out}@keyframes pop{from{transform:translateY(8px);opacity:0}}}
 
@@ -450,7 +461,7 @@ body.locked #gate{display:flex}
     </fieldset>
   </form>
   <div id="proofWrap" style="display:none">
-    <div class="receipt proof" id="proof"></div>
+    <div class="vwrap"><div class="voucher dvou" id="proof"></div></div>
     <div class="row">
       <button type="button" class="btn main" id="pCopy"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 14h6M9 17h4"/></svg>Enviar PDF por WhatsApp</button>
       <button type="button" class="btn sec" id="pDown">Descargar PDF</button>
@@ -772,7 +783,20 @@ $("dGal").addEventListener("change",async()=>{await addPhotos($("dGal").files);$
 $("dPhotos").addEventListener("click",e=>{const b=e.target.closest("[data-rm]");if(!b)return;const i=+b.dataset.rm;URL.revokeObjectURL(photos[i]);photos.splice(i,1);renderPhotos()});
 
 const maskCed=c=>{const s=c.replace(/-/g,"").toUpperCase();return `${s.slice(0,3)}-******-${s.slice(9)}`};
-$("g").addEventListener("submit",e=>{
+const dLogo=`<svg width="46" height="46" viewBox="0 0 120 120" aria-hidden="true"><path d="M88.3 26.3 A44 44 0 1 0 88.3 93.7" fill="none" stroke="#0B2545" stroke-width="15" stroke-linecap="round"/><circle cx="88.3" cy="26.3" r="10" fill="#13A89E"/><path d="M60 76 C 45 65, 42 55, 49 49 C 54 45, 60 48, 60 53 C 60 48, 66 45, 71 49 C 78 55, 75 65, 60 76 Z" fill="#F08A4B"/></svg>`;
+/* Recorta la foto al formato exacto (sin deformarla): html2canvas no respeta object-fit */
+function cropTo(u,ratio){return new Promise(res=>{const im=new Image();im.onload=()=>{let sw=im.naturalWidth,sh=im.naturalHeight,sx=0,sy=0;
+    if(sw/sh>ratio){const n=sh*ratio;sx=(sw-n)/2;sw=n}else{const n=sw/ratio;sy=(sh-n)/2;sh=n}
+    const W=Math.min(900,Math.round(sw)),H=Math.round(W/ratio),c=document.createElement("canvas");c.width=W;c.height=H;
+    c.getContext("2d").drawImage(im,sx,sy,sw,sh,0,0,W,H);res(c.toDataURL("image/jpeg",.88))};im.onerror=()=>res(u);im.src=u})}
+/* Recorta la firma a su trazo y calcula su tamaño en pantalla manteniendo la proporción */
+function trimSig(){const W=cv.width,H=cv.height,d=ctx.getImageData(0,0,W,H).data;let x0=W,y0=H,x1=-1,y1=-1;
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(d[(y*W+x)*4+3]>10){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+  if(x1<0)return {u:cv.toDataURL("image/png"),w:240,h:80};
+  const pad=Math.round(8*(window.devicePixelRatio||1));x0=Math.max(0,x0-pad);y0=Math.max(0,y0-pad);x1=Math.min(W-1,x1+pad);y1=Math.min(H-1,y1+pad);
+  const w=x1-x0+1,h=y1-y0+1,c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(cv,x0,y0,w,h,0,0,w,h);
+  const k=Math.min(240/w,84/h);return {u:c.toDataURL("image/png"),w:Math.round(w*k),h:Math.round(h*k)}}
+$("g").addEventListener("submit",async e=>{
   e.preventDefault();const err=m=>{$("gErr").textContent=m};
   const code=$("dCode").value.trim().toUpperCase(),name=$("dName").value.trim(),ced=$("dCed").value.trim();
   const rate=(document.querySelector('input[name="rate"]:checked')||{}).value;
@@ -784,22 +808,38 @@ $("g").addEventListener("submit",e=>{
   if(!$("dOk").checked)return err("Falta marcar «Recibí el pedido completo y en buen estado».");
   if(!rate)return err("Falta la calificación con estrellas.");
   err("");
-  const when=new Date().toLocaleString("es-NI",{dateStyle:"medium",timeStyle:"short"});
-  const stars="★".repeat(rate)+"☆".repeat(5-rate),com=$("dCom").value.trim(),sigURL=cv.toDataURL("image/png");
-  $("proof").innerHTML=`<div class="hd"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7 12.5l3.2 3.2L17 9"/></svg>Entrega verificada</div>`+
-    (photos.length?`<div class="phs n${photos.length}">${photos.map((u,i)=>`<img src="${u}" alt="Foto de la entrega ${i+1}">`).join("")}</div>`:"")+
-    `<dl><dt>Pedido</dt><dd>${esc(code)}</dd><dt>Recibí conforme</dt><dd>${esc(name)}</dd><dt>Cédula</dt><dd>${esc(maskCed(ced))}</dd>`+
-    `<dt>Fecha y hora</dt><dd>${esc(when)}</dd><dt>PIN</dt><dd class="okc">Verificado ✓</dd><dt>Calificación</dt><dd><span class="starsv">${stars}</span> ${rate}/5</dd>`+
-    (com?`<dt>Comentario</dt><dd>${esc(com)}</dd>`:"")+`</dl>`+
-    `<div style="padding:0 22px 18px"><div class="hint" style="margin-bottom:6px">Firma</div><img class="sigimg" src="${sigURL}" alt="Firma de ${esc(name)}"></div>`+
-    `<div class="ft"><b style="font-family:Sora,sans-serif;color:var(--ink)">cerquita</b> · Lo pedís desde lejos. Lo ves llegar.</div>`;
+  const now=new Date(),tz="America/Managua";
+  const when=now.toLocaleString("es-NI",{timeZone:tz,dateStyle:"medium",timeStyle:"short"});
+  const fechaE=now.toLocaleDateString("es-NI",{timeZone:tz,day:"2-digit",month:"short",year:"numeric"});
+  const horaE=now.toLocaleTimeString("es-NI",{timeZone:tz,hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
+  const stars="★".repeat(rate)+"☆".repeat(5-rate),com=$("dCom").value.trim();
+  const ver=("EV"+code.replace(/\D/g,"").slice(-6)+now.getTime().toString(36).slice(-4)).toUpperCase();
+  const sigURL=trimSig(),phs=await Promise.all(photos.map(u=>cropTo(u,photos.length===2?1:4/3)));
+  const pw=photos.length===2?146:296,ph=photos.length===2?146:222;
+  $("proof").innerHTML=`<div class="vh">${dLogo}<div class="bn">cerquita</div><small>Compras de confianza · Managua</small><small>WhatsApp +505 8707 2125</small></div>
+    <div class="vt">COMPROBANTE DE<br>ENTREGA VERIFICADA</div>
+    <div class="ok"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7 12.5l3.2 3.2L17 9"/></svg>Pedido entregado</div><hr>
+    <div class="ln"><span>Pedido</span><span>${esc(code)}</span></div>
+    <div class="ln"><span>Fecha de entrega</span><span>${esc(fechaE)}</span></div>
+    <div class="ln"><span>Hora de entrega</span><span>${esc(horaE)}</span></div>
+    <div class="ln"><span>PIN de seguridad</span><span style="color:#0E8A82">Verificado ✓</span></div><hr>
+    ${phs.length?`<div class="dph">${phs.map((u,i)=>`<img src="${u}" width="${pw}" height="${ph}" alt="Foto de la entrega ${i+1}">`).join("")}</div><div class="cap">Evidencia fotográfica de la entrega</div><hr>`:""}
+    <div class="ln"><span>Recibió conforme</span><span>${esc(name)}</span></div>
+    <div class="ln"><span>Cédula</span><span>${esc(maskCed(ced))}</span></div>
+    <div class="ln"><span>Calificación</span><span><span class="stv">${stars}</span> ${rate}/5</span></div>
+    ${com?`<p class="cm">«${esc(com)}»</p>`:""}
+    <div class="dsig"><img src="${sigURL.u}" style="width:${sigURL.w}px;height:${sigURL.h}px" alt="Firma de ${esc(name)}"><div class="sl">${esc(name)}<small>Firma de quien recibe</small></div></div><hr>
+    <div class="ty"><b>¡Gracias por confiar en Cerquita!</b>La distancia se mide en kilómetros,<br>pero el cariño se entrega en persona.</div>
+    <div class="code">${esc(ver)}</div>
+    <p class="fine">Comprobante emitido electrónicamente al momento de la entrega. La firma, la cédula y el PIN confirman que el pedido fue recibido completo y en buen estado.</p>
+    <div class="sg">Lo pedís desde lejos. Lo ves llegar.</div>`;
   proofText=[`*Cerquita · Entrega verificada ✓*`,`Paso 6 de 6 · Pedido completado`,`Pedido: ${code}`,`Recibí conforme: ${name}`,`Cédula: ${maskCed(ced)}`,`Fecha y hora: ${when}`,
-    `PIN: verificado`,`Calificación: ${stars} (${rate}/5)`,com?`Comentario: "${com}"`:"",``,`Lo pedís desde lejos. Lo ves llegar.`].filter(Boolean).join("\n");
+    `PIN: verificado`,`Calificación: ${stars} (${rate}/5)`,com?`Comentario: "${com}"`:"",``,`¡Gracias por confiar en Cerquita! La distancia se mide en kilómetros, pero el cariño se entrega en persona.`].filter(Boolean).join("\n");
   if(API_URL&&pKey)api({action:"estado",key:pKey,codigo:code,estado:"Entregado",extra:{calificacion:+rate,recibio:name,fechaEntrega:when}}).then(r=>{if(r&&r.ok)loadOrders()}).catch(()=>{});
   $("g").style.display="none";$("proofWrap").style.display="block";$("proofWrap").scrollIntoView({behavior:"smooth",block:"start"});
 });
-$("pCopy").addEventListener("click",()=>sendPdf($("proof"),"Comprobante-"+($("dCode").value.trim().toUpperCase()||"entrega")+".pdf",$("dWa").value,proofText,$("pMsg"),"Comprobante de entrega verificada"));
-$("pDown").addEventListener("click",()=>downPdf($("proof"),"Comprobante-"+($("dCode").value.trim().toUpperCase()||"entrega")+".pdf",$("pMsg")));
+$("pCopy").addEventListener("click",()=>sendPdf($("proof"),"Comprobante-"+($("dCode").value.trim().toUpperCase()||"entrega")+".pdf",$("dWa").value,proofText,$("pMsg"),"Comprobante de entrega verificada","ticket"));
+$("pDown").addEventListener("click",()=>downPdf($("proof"),"Comprobante-"+($("dCode").value.trim().toUpperCase()||"entrega")+".pdf",$("pMsg"),"ticket"));
 $("pNew").addEventListener("click",()=>{$("g").reset();$("pinMsg").textContent="";photos.forEach(u=>URL.revokeObjectURL(u));photos=[];renderPhotos();
   $("proofWrap").style.display="none";$("g").style.display="";sizeCv();window.scrollTo(0,0)});
 
