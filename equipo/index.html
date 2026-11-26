@@ -2594,13 +2594,18 @@ async function tryUnlock(){const k=$("gKey").value.trim();if(!k)return;$("gMsg")
 const b64u=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 const unb64u=s=>Uint8Array.from(atob(s.replace(/-/g,"+").replace(/_/g,"/")+"===".slice((s.length+3)%4)),c=>c.charCodeAt(0));
 const rnd=n=>crypto.getRandomValues(new Uint8Array(n));
-async function bioAvailable(){try{return !!(window.PublicKeyCredential&&await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())}catch(e){return false}}
+const AND=window.CerquitaAndroid;
+const nativeBio=t=>new Promise(r=>{window.__bioCb=ok=>r(!!ok);try{AND.bio(t)}catch(e){r(false)}});
+async function bioAvailable(){if(AND&&AND.bioAvailable)try{return !!AND.bioAvailable()}catch(e){return false}
+  try{return !!(window.PublicKeyCredential&&await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())}catch(e){return false}}
 const bioEnrolled=()=>!!lsGet("cerquita-bio","");
 async function bioRefresh(){const av=await bioAvailable(),en=bioEnrolled();
   $("gBio").style.display=av&&en?"":"none";$("gOr").style.display=av&&en?"":"none";
   $("bioBtn").classList.toggle("on",av&&!en);
   return {av,en}}
 async function bioEnroll(){
+  if(AND&&AND.bio){const ok=await nativeBio("Activar entrada con huella");if(!ok){$("pStatus").textContent="Activación de huella cancelada.";return false}
+    lsSet("cerquita-bio","android");lsSet("cerquita-bio-k",pKey);bioRefresh();$("pStatus").textContent="Entrada con huella activada ✓ La próxima vez podés entrar con tu huella.";return true}
   try{const cred=await navigator.credentials.create({publicKey:{challenge:rnd(32),rp:{name:"Cerquita Equipo"},
       user:{id:rnd(16),name:"equipo@cerquita",displayName:"Equipo Cerquita"},
       pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],
@@ -2610,7 +2615,8 @@ async function bioEnroll(){
   catch(e){$("pStatus").textContent=e&&e.name==="NotAllowedError"?"Activación de huella cancelada.":"Este teléfono no permitió activar la huella.";return false}}
 async function bioLogin(){
   const id=lsGet("cerquita-bio","");if(!id)return;$("gMsg").textContent="";
-  try{const a=await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:"public-key",id:unb64u(id),transports:["internal","hybrid"]}],userVerification:"required",timeout:60000}});
+  try{const a=AND&&AND.bio?(await nativeBio("Entrar a Cerquita Equipo")||null):await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:"public-key",id:unb64u(id),transports:["internal","hybrid"]}],userVerification:"required",timeout:60000}});
+    if(!a&&AND&&AND.bio){$("gMsg").textContent="No se reconoció la huella o se canceló. Probá de nuevo o usá la clave.";return}
     if(!a)return;const k=lsGet("cerquita-bio-k","");let h="";try{h=await sha(k)}catch(e){}
     if(h!==TEAM_HASH){$("gMsg").textContent="La huella es válida, pero la clave guardada cambió. Entrá con la clave y volvé a activar la huella.";lsSet("cerquita-bio","");bioRefresh();return}
     lsSet("cerquita-team",h);pKey=k;lsSet("cerquita-key",k);document.body.classList.remove("locked");route();startPolling()}

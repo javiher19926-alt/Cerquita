@@ -1,0 +1,48 @@
+name: Generar APK de Android
+on:
+  push:
+    branches: [main]
+    paths: ["android/**", ".github/workflows/android.yml"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.10.2"
+      - name: Clave de firma (opcional)
+        env:
+          KS: ${{ secrets.CQ_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KS" ]; then echo "$KS" | base64 -d > "$RUNNER_TEMP/release.jks"; echo "CQ_KEYSTORE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"; fi
+      - name: Compilar
+        working-directory: android
+        env:
+          CQ_STORE_PASS: ${{ secrets.CQ_STORE_PASS }}
+          CQ_KEY_ALIAS: ${{ secrets.CQ_KEY_ALIAS }}
+          CQ_KEY_PASS: ${{ secrets.CQ_KEY_PASS }}
+        run: gradle --no-daemon assembleRelease
+      - name: Renombrar
+        run: |
+          mkdir out
+          cp android/app/build/outputs/apk/cliente/release/app-cliente-release.apk out/Cerquita.apk
+          cp android/app/build/outputs/apk/equipo/release/app-equipo-release.apk out/Cerquita-Equipo.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: out/*.apk
+      - name: Publicar en la página de descargas
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete apk --yes --cleanup-tag 2>/dev/null || true
+          gh release create apk out/Cerquita.apk out/Cerquita-Equipo.apk --title "Cerquita para Android (versión ${{ github.run_number }})" --notes "Descargue Cerquita-Equipo.apk para el equipo y Cerquita.apk para clientes. Al instalar, Android pedirá permitir apps de origen desconocido."
