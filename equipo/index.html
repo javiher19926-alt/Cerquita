@@ -2016,7 +2016,7 @@ return module.exports})();
 return {QRCode:M['./index'],ECL:M['./QRErrorCorrectLevel']}})();
 /* Dibuja un código QR (imagen PNG nítida) con el texto indicado en UTF-8 */
 function qrSvg(text,px){const q=new QRLib.QRCode(-1,QRLib.ECL.L);q.addData(unescape(encodeURIComponent(text)));q.make();
-  const n=q.getModuleCount(),b=4,N=n+2*b,k=8,c=document.createElement("canvas");c.width=c.height=N*k;const x=c.getContext("2d");
+  const n=q.getModuleCount(),b=4,N=n+2*b,u=Math.max(1,Math.round(px/N)),k=u*2,c=document.createElement("canvas");px=u*N;c.width=c.height=N*k;const x=c.getContext("2d");
   x.fillStyle="#fff";x.fillRect(0,0,N*k,N*k);x.fillStyle="#0B2545";
   for(let r=0;r<n;r++)for(let col=0;col<n;col++)if(q.isDark(r,col))x.fillRect((col+b)*k,(r+b)*k,k,k);
   return `<img class="qr" src="${c.toDataURL("image/png")}" width="${px}" height="${px}" alt="Código QR con los datos del comprobante">`}
@@ -2097,7 +2097,7 @@ $("g").addEventListener("submit",async e=>{
     <div class="dsig"><img src="${sigURL.u}" style="width:${sigURL.w}px;height:${sigURL.h}px" alt="Firma de ${esc(name)}"><div class="sl">${esc(name)}<small>Firma de quien recibe</small></div></div><hr>
     <div class="ty"><b>¡Gracias por confiar en Cerquita!</b>La distancia se mide en kilómetros,<br>pero el cariño se entrega en persona.</div>
     ${qrSvg([`CERQUITA · Entrega verificada`,`Pedido: ${code}`,`Entregado: ${fechaE} ${horaE}`,`Recibió conforme: ${name}`,`Cédula: ${maskCed(ced)}`,
-      `PIN de seguridad: verificado`,`Calificación: ${stars} (${rate}/5)`,com?`Comentario: ${com}`:"",`Fotos de evidencia: ${photos.length}`,`Verificación: ${ver}`,`WhatsApp +505 8707 2125`].filter(Boolean).join("\n"),156)}
+      `PIN de seguridad: verificado`,`Calificación: ${stars} (${rate}/5)`,com?`Comentario: ${com}`:"",`Fotos de evidencia: ${photos.length}`,`Verificación: ${ver}`,`WhatsApp +505 8707 2125`].filter(Boolean).join("\n"),117)}
     <div class="qrc">Escanee el código para ver los datos de la entrega</div><div class="code">${esc(ver)}</div>
     <p class="fine">Comprobante emitido electrónicamente al momento de la entrega. La firma, la cédula y el PIN confirman que el pedido fue recibido completo y en buen estado.</p>
     <div class="sg">Lo pedís desde lejos. Lo ves llegar.</div>`;
@@ -2319,7 +2319,7 @@ $("k").addEventListener("submit",e=>{
     <div class="ln"><span>Cargo</span><span>${v("kRole")}</span></div>
     ${qrSvg([`CERQUITA · Comprobante de pago recibido`,`Comprobante: ${no}`,`Pedido: ${code}`,`Emitido: ${corta} ${hora}`,`Cliente: ${$("kClient").value.trim()}`,
       $("kBenef").value.trim()?`Beneficiario: ${$("kBenef").value.trim()}`:"",`Monto recibido: ${m}`,`Banco de origen: ${$("kBank").value.trim()}`,`Referencia: ${$("kRef").value.trim()}`,
-      `Estado: ${partial?"Pago parcial recibido":"Pago confirmado"}`,`Confirmado por: ${$("kName").value.trim()}`,`Verificación: ${ver}`,`WhatsApp +505 8707 2125`].filter(Boolean).join("\n"),156)}
+      `Estado: ${partial?"Pago parcial recibido":"Pago confirmado"}`,`Confirmado por: ${$("kName").value.trim()}`,`Verificación: ${ver}`,`WhatsApp +505 8707 2125`].filter(Boolean).join("\n"),117)}
     <div class="qrc">Escanee el código para ver los datos del pago</div><div class="code">${esc(ver)}</div>
     <div style="text-align:center;font:700 12px Sora,sans-serif;letter-spacing:.3px;margin-top:12px;padding:8px;border:1.5px solid #0B2545;border-radius:6px">DOCUMENTO ELECTRÓNICO VÁLIDO SIN FIRMA NI SELLO</div>
     <p class="fine">Comprobante emitido electrónicamente por Cerquita. Por su carácter electrónico no requiere firma autógrafa ni sello; su autenticidad se verifica con el código impreso. Confirma la recepción del pago y no sustituye el comprobante emitido por su banco. Consérvelo como respaldo de su pedido.</p>`;
