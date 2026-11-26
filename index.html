@@ -367,8 +367,8 @@ footer{padding-bottom:max(40px,env(safe-area-inset-bottom))}
   <button type="button" class="instbtn" id="instBtn">Instalar app</button>
 </div></header>
 <section class="hero vp"><div class="in hgrid"><div>
-  <h1>Su familia en Managua, atendida como si usted estuviera aquí.</h1>
-  <p>Cuéntenos qué necesita su familia: el súper, medicinas, un pastel, materiales para la casa o que alguien acompañe a su mamá a una cita. Le enviamos la cotización, usted paga por transferencia y le enviamos la prueba de cada entrega.</p>
+  <h1>Su familia en Nicaragua, atendida como si usted estuviera ahí.</h1>
+  <p>Desde el extranjero o desde cualquier ciudad del país, cuéntenos qué necesita su familia: el súper, medicinas, un pastel, materiales para la casa o que alguien acompañe a su mamá a una cita. Le enviamos la cotización, usted paga por transferencia y le enviamos la prueba de cada entrega. Entregamos en Managua y en todos los departamentos de Nicaragua.</p>
   <div class="row" style="margin-top:22px">
     <button type="button" class="btn main" data-open="dPedido">Hacer un pedido</button>
     <button type="button" class="btn ghost" data-open="dProceso">Conocer el proceso</button>
@@ -443,18 +443,21 @@ footer{padding-bottom:max(40px,env(safe-area-inset-bottom))}
     <legend>Sus datos</legend>
     <label><span>Su nombre completo <span class="req">*</span></span><input id="sName" autocomplete="name" required></label>
     <label><span>País donde vive <span class="req">*</span></span>
-      <select id="sCountry" required><option value="">Elija…</option><option>Costa Rica</option><option>Estados Unidos</option><option>España</option><option>Panamá</option><option>Canadá</option><option>Otro país</option></select></label>
+      <select id="sCountry" required><option value="">Elija…</option><option>Nicaragua</option><option>Costa Rica</option><option>Estados Unidos</option><option>España</option><option>Panamá</option><option>Canadá</option><option>Otro país</option></select></label>
     <label><span>Su WhatsApp con código de país <span class="req">*</span></span><input id="sPhone" type="tel" inputmode="tel" placeholder="+506 8888 8888" required></label>
     <label><span>Correo electrónico <span class="hint">(opcional)</span></span><input id="sMail" type="email" autocomplete="email"></label>
   </fieldset>
 
   <fieldset>
-    <legend>¿Quién recibe en Managua?</legend>
+    <legend>¿Quién recibe el pedido?</legend>
     <label><span>Nombre de su familiar <span class="req">*</span></span><input id="rName" required></label>
     <label>Parentesco<select id="rRel"><option>Mamá</option><option>Papá</option><option>Abuelo/a</option><option>Hijo/a</option><option>Hermano/a</option><option>Esposo/a</option><option>Otro familiar</option></select></label>
     <label><span>Teléfono del familiar <span class="req">*</span></span><input id="rPhone" type="tel" inputmode="tel" placeholder="8888 8888" required></label>
-    <label>Distrito<select id="rDist"><option>Distrito I</option><option>Distrito II</option><option>Distrito III</option><option>Distrito IV</option><option>Distrito V</option><option>Distrito VI</option><option>Distrito VII</option><option>No sé</option></select></label>
-    <label class="full"><span>Barrio o residencial <span class="req">*</span></span><input id="rBarrio" required></label>
+    <label><span>Departamento <span class="req">*</span></span><select id="rDep"><option>Managua</option><option>Boaco</option><option>Carazo</option><option>Chinandega</option><option>Chontales</option><option>Estelí</option><option>Granada</option><option>Jinotega</option><option>León</option><option>Madriz</option><option>Masaya</option><option>Matagalpa</option><option>Nueva Segovia</option><option>Río San Juan</option><option>Rivas</option><option>Costa Caribe Norte</option><option>Costa Caribe Sur</option></select></label>
+    <label><span>Municipio <span class="req">*</span></span><input id="rMun" value="Managua" list="munList" autocomplete="off"></label>
+    <datalist id="munList"></datalist>
+    <label id="rDistL">Distrito<select id="rDist"><option>Distrito I</option><option>Distrito II</option><option>Distrito III</option><option>Distrito IV</option><option>Distrito V</option><option>Distrito VI</option><option>Distrito VII</option><option>No sé</option></select></label>
+    <label class="full"><span>Barrio, comarca o comunidad <span class="req">*</span></span><input id="rBarrio" required></label>
     <label class="full"><span>Dirección con puntos de referencia <span class="req">*</span></span><textarea id="rAddr" placeholder="Ej.: del semáforo de la rotonda, 2 cuadras al lago, casa portón negro" required></textarea></label>
     <label class="full"><span>Ubicación en el mapa <span class="hint">(recomendado)</span></span>
       <input id="rLoc" inputmode="url" placeholder="Pegue aquí el enlace de Google Maps o las coordenadas">
@@ -552,7 +555,8 @@ footer{padding-bottom:max(40px,env(safe-area-inset-bottom))}
     <div class="panel"><div class="svc">
   <div><h3>Tienda propia y mucho más</h3><p>Tenemos tienda propia con productos accesibles para la canasta del mes, y además resolvemos súper, medicinas, pasteles y regalos, pago de servicios, materiales de construcción, electrodomésticos, muebles, y acompañar a su familiar a citas o trámites. Si lo necesita su familia y es legal, lo resolvemos.</p></div>
   <div><h3>Moto, carro o pickup</h3><p>Usamos el vehículo que requiere su encargo: moto para mandados rápidos, carro para compras grandes y acompañamiento, y pickup para materiales, muebles y electrodomésticos.</p></div>
-  <div><h3>Lo que no hacemos</h3><p>No compramos ni entregamos licores, cervezas ni sustancias prohibidas. Por ahora atendemos solo dentro de Managua.</p></div>
+  <div><h3>Lo que no hacemos</h3><p>No compramos ni entregamos licores, cervezas ni sustancias prohibidas. </p></div>
+  <div><h3>Todo Nicaragua</h3><p>Entregamos en Managua y en los 15 departamentos y las 2 regiones autónomas de la Costa Caribe. Fuera de Managua, el plazo y el costo de entrega se indican en la cotización.</p></div>
 </div></div>
   </details>
 </div>
@@ -595,13 +599,20 @@ function numberItems(){[...$("items").children].forEach((r,i)=>{r.querySelector(
 $("addItem").addEventListener("click",()=>{addItem();$("items").lastChild.querySelector("input").focus()});
 $("items").addEventListener("click",e=>{if(e.target.matches(".icon-btn")){e.target.closest(".item").remove();if(!$("items").children.length)addItem();numberItems();update()}});
 
-const F=["sName","sCountry","sPhone","sMail","rName","rRel","rPhone","rDist","rBarrio","rAddr","rLoc","budget","date","slot","rec","notes","card"];
+const F=["sName","sCountry","sPhone","sMail","rName","rRel","rPhone","rDep","rMun","rDist","rBarrio","rAddr","rLoc","budget","date","slot","rec","notes","card"];
 const val=id=>$(id).value.trim();
 const cats=()=>[...document.querySelectorAll("#cats input:checked")].map(i=>i.value);
 const items=()=>[...document.querySelectorAll(".item")].map(r=>{const o={d:r.querySelector(".iDesc").value.trim(),q:r.querySelector(".iQty").value.trim(),x:{}};
   DET.forEach(([k])=>{o.x[k]=r.querySelector(".na-"+k).checked?"N/A":r.querySelector(".d-"+k).value.trim()});o.x.otros=r.querySelector(".d-otros").value.trim();o.x.orient=r.querySelector(".d-orient").value.trim().replace(/\s*\n\s*/g," / ");return o}).filter(x=>x.d);
 const detTxt=x=>[["Marca",x.marca],["Color",x.color],["Tipo",x.tipo],["Otros detalles",x.otros],["Orientaciones",x.orient]].filter(([,v])=>v).map(([l,v])=>`${l}: ${v}`).join(" · ");
-function vehicle(){let m=1;for(const c of cats()){const x=CATS.find(a=>a[0]===c);if(x&&x[2]>m)m=x[2]}return VEH[m]}
+const MUNIS={"Managua": ["Managua", "Ciudad Sandino", "Tipitapa", "Ticuantepe", "Mateare", "Villa El Carmen", "San Rafael del Sur", "El Crucero", "San Francisco Libre"], "Masaya": ["Masaya", "Nindirí", "Catarina", "Niquinohomo", "Masatepe", "La Concepción", "Nandasmo", "San Juan de Oriente", "Tisma"], "Granada": ["Granada", "Diriomo", "Diriá", "Nandaime"], "Carazo": ["Jinotepe", "Diriamba", "San Marcos", "Dolores", "Santa Teresa", "El Rosario", "La Paz de Carazo", "La Conquista"], "León": ["León", "Nagarote", "La Paz Centro", "El Sauce", "Larreynaga", "Telica", "Quezalguaque", "Santa Rosa del Peñón", "El Jicaral", "Achuapa"], "Chinandega": ["Chinandega", "Corinto", "El Realejo", "Chichigalpa", "Posoltega", "El Viejo", "Puerto Morazán", "Somotillo", "Villanueva", "Cinco Pinos", "Santo Tomás del Norte", "San Francisco del Norte", "San Pedro del Norte"], "Rivas": ["Rivas", "San Juan del Sur", "Tola", "Belén", "Potosí", "Buenos Aires", "Moyogalpa", "Altagracia", "Cárdenas", "San Jorge"], "Estelí": ["Estelí", "Condega", "Pueblo Nuevo", "La Trinidad", "San Juan de Limay", "San Nicolás"], "Matagalpa": ["Matagalpa", "Sébaco", "Ciudad Darío", "San Isidro", "Terrabona", "Muy Muy", "Matiguás", "Río Blanco", "San Ramón", "El Tuma-La Dalia", "Rancho Grande", "Waslala", "Esquipulas", "San Dionisio"], "Jinotega": ["Jinotega", "San Rafael del Norte", "La Concordia", "San Sebastián de Yalí", "Santa María de Pantasma", "Wiwilí", "El Cuá", "San José de Bocay"], "Boaco": ["Boaco", "Camoapa", "San Lorenzo", "Santa Lucía", "Teustepe", "San José de los Remates"], "Chontales": ["Juigalpa", "Acoyapa", "Santo Tomás", "Villa Sandino", "La Libertad", "Santo Domingo", "Comalapa", "Cuapa", "San Pedro de Lóvago", "El Coral"], "Madriz": ["Somoto", "Palacagüina", "Yalagüina", "Totogalpa", "Telpaneca", "San Juan de Río Coco", "San Lucas", "Las Sabanas", "San José de Cusmapa"], "Nueva Segovia": ["Ocotal", "Jalapa", "El Jícaro", "Quilalí", "Murra", "Wiwilí de Nueva Segovia", "Santa María", "Macuelizo", "Dipilto", "Mozonte", "San Fernando", "Ciudad Antigua"], "Río San Juan": ["San Carlos", "San Miguelito", "Morrito", "El Almendro", "El Castillo", "San Juan de Nicaragua"], "Costa Caribe Norte": ["Puerto Cabezas (Bilwi)", "Siuna", "Rosita", "Bonanza", "Waspam", "Prinzapolka", "Mulukukú", "Waslala"], "Costa Caribe Sur": ["Bluefields", "Corn Island", "Nueva Guinea", "El Rama", "Pearl Lagoon", "Kukra Hill", "Muelle de los Bueyes", "El Tortuguero", "La Cruz de Río Grande", "Desembocadura de Río Grande", "El Ayote", "Paiwas"]};
+function depUI(){const d=$("rDep").value;$("munList").innerHTML=(MUNIS[d]||[]).map(m=>`<option value="${m}">`).join("");
+  const mga=d==="Managua"&&/^managua$/i.test(($("rMun").value||"").trim());$("rDistL").style.display=mga?"":"none"}
+$("rDep").addEventListener("change",()=>{const d=$("rDep").value,m=MUNIS[d]||[];if(!m.includes($("rMun").value))$("rMun").value=m[0]||"";depUI();update()});
+$("rMun").addEventListener("input",depUI);
+function zona(){const d=val("rDep")||"Managua",m=val("rMun"),mga=d==="Managua"&&/^managua$/i.test(m);
+  return [val("rBarrio"),mga?val("rDist"):"",m,m.toLowerCase()===d.toLowerCase()?"":d].filter(x=>x&&x!=="No sé").join(", ")}
+function vehicle(){let m=1;for(const c of cats()){const x=CATS.find(a=>a[0]===c);if(x&&x[2]>m)m=x[2]}const d=$("rDep")?$("rDep").value:"Managua";return d==="Managua"?VEH[m]:"Envío a "+d}
 function banned(){return [...items().map(i=>i.d+" "+detTxt(i.x)),val("notes"),val("card")].some(t=>BAN.test(norm(t)))}
 
 function locUrl(){
@@ -621,7 +632,7 @@ function update(){
   else $("locHint").textContent="Pida a su familiar que abra WhatsApp, toque el clip, elija «Ubicación» y le envíe su ubicación actual. Ábrala, toque «Compartir» y pegue aquí el enlace.";
   const its=items(),cs=cats().map(c=>CATS.find(a=>a[0]===c)[1]);
   const rows=[["Envía",val("sName")||"—"],["Desde",val("sCountry")||"—"],["Recibe",val("rName")?`${val("rName")} (${val("rRel")})`:"—"],
-    ["Zona",val("rBarrio")?`${val("rBarrio")}, ${val("rDist")}`:"—"],["Ubicación",lu?"En el mapa ✓":lu===null?"Enlace no válido":"Sin ubicación"],["Pedido",cs.join(", ")||"—"],["Artículos",its.length?its.length+" en la lista":"—"],
+    ["Zona",val("rBarrio")?zona():"—"],["Ubicación",lu?"En el mapa ✓":lu===null?"Enlace no válido":"Sin ubicación"],["Pedido",cs.join(", ")||"—"],["Artículos",its.length?its.length+" en la lista":"—"],
     ["Entrega",(val("date")||"Fecha por definir")+" · "+val("slot")]];
   $("sum").innerHTML=rows.map(([a,b])=>`<dt>${a}</dt><dd>${esc(b)}</dd>`).join("")+`<dt>Vehículo</dt><dd><span class="veh">${vehicle()}</span></dd>`;
   $("warn").classList.toggle("on",banned());
@@ -632,7 +643,7 @@ $("f").addEventListener("input",update);$("f").addEventListener("change",update)
 try{const d=JSON.parse(localStorage.getItem("cerquita-draft")||"null");
   if(d){F.forEach(i=>{if(d.f&&d.f[i]!=null)$(i).value=d.f[i]});(d.c||[]).forEach(v=>{const x=document.querySelector(`#cats input[value="${v}"]`);if(x)x.checked=true});(d.i||[]).forEach(x=>addItem(x.d,x.q,x.x||{}))}}catch(e){}
 if(!$("items").children.length)addItem();
-update();
+depUI();update();
 
 const STEPS=[
   ["Solicitud del pedido","Usted completa el formulario con los datos del beneficiario y el detalle de los productos o servicios requeridos.","Cliente","Número de pedido y PIN de entrega","Inmediato"],
@@ -655,7 +666,7 @@ function repeatOrder(i){const o=cGet("cerquita-mis",[])[i];if(!o||!o.snap)return
   F.forEach(k=>{if(d.f&&d.f[k]!=null)$(k).value=d.f[k]});$("date").value="";
   document.querySelectorAll("#cats input").forEach(x=>{x.checked=(d.c||[]).includes(x.value)});
   $("items").innerHTML="";(d.i||[]).forEach(x=>addItem(x.d,x.q,x.x||{}));if(!$("items").children.length)addItem();
-  $("ok").checked=false;$("done").classList.remove("on");update();
+  $("ok").checked=false;$("done").classList.remove("on");depUI();update();
   const dp=$("dPedido");dp.open=true;dp.scrollIntoView({behavior:"smooth",block:"start"})}
 function icsEsc(t){return String(t).replace(/[\;,]/g,m=>"\\"+m).replace(/\n/g,"\\n")}
 function icsDate(ms){const d=new Date(ms);return d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")}
@@ -740,7 +751,7 @@ document.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",(
 let lastText="";
 $("f").addEventListener("submit",e=>{
   e.preventDefault();
-  const need=["sName","sCountry","sPhone","rName","rPhone","rBarrio","rAddr"];
+  const need=["sName","sCountry","sPhone","rName","rPhone","rMun","rBarrio","rAddr"];
   for(const id of need){if(!val(id)){$(id).focus();$(id).setAttribute("aria-invalid","true");return}$(id).removeAttribute("aria-invalid")}
   if(locUrl()===null){$("rLoc").focus();return}
   if(!items().length){document.querySelector(".iDesc").focus();return}
@@ -751,13 +762,13 @@ $("f").addEventListener("submit",e=>{
   const pin=String(Math.floor(1000+Math.random()*9000));
   const cs=cats().map(c=>CATS.find(a=>a[0]===c)[1]).join(", ")||"Sin especificar";
   lastText=[`*Nuevo pedido Cerquita ${code}*`,``,`*Envía:* ${val("sName")} (${val("sCountry")})`,`WhatsApp: ${val("sPhone")}${val("sMail")?" · "+val("sMail"):""}`,``,
-    `*Recibe:* ${val("rName")} (${val("rRel")}) · Tel. ${val("rPhone")}`,`${val("rBarrio")}, ${val("rDist")}, Managua`,`Dirección: ${val("rAddr")}`,`Ubicación: ${locUrl()||"no enviada (confirmar por teléfono)"}`,``,
+    `*Recibe:* ${val("rName")} (${val("rRel")}) · Tel. ${val("rPhone")}`,zona(),`Dirección: ${val("rAddr")}`,`Ubicación: ${locUrl()||"no enviada (confirmar por teléfono)"}`,``,
     `*Tipo:* ${cs}`,`*Lista:*`,...items().map(i=>{const t=detTxt(i.x);return `• ${i.q?i.q+" × ":""}${i.d}${t?"\n   ↳ "+t:""}`}),
     val("notes")?`Indicaciones: ${val("notes")}`:"",val("budget")?`Presupuesto máximo: ${val("budget")}`:"",
     `Entrega: ${val("date")||"por definir"} · ${val("slot")} · Vehículo sugerido: ${vehicle()}`,val("rec")?`*Pedido recurrente:* ${val("rec")==="15"?"cada 15 días":"cada mes"}`:"",
     val("card")?`Tarjeta: "${val("card")}"`:"",``,`*PIN de entrega:* ${pin} (uso interno de Cerquita para verificar)`].filter((l,i,a)=>l!==""||a[i-1]!=="").join("\n");
   storeOrder(code,{codigo:code,cliente:val("sName"),pais:val("sCountry"),whatsapp:val("sPhone"),correo:val("sMail"),beneficiario:val("rName"),parentesco:val("rRel"),
-    telBeneficiario:val("rPhone"),distrito:val("rDist"),barrio:val("rBarrio"),direccion:val("rAddr"),ubicacion:locUrl()||"",tipo:cs,
+    telBeneficiario:val("rPhone"),departamento:val("rDep"),municipio:val("rMun"),distrito:$("rDistL").style.display==="none"?"":val("rDist"),barrio:val("rBarrio"),direccion:val("rAddr"),ubicacion:locUrl()||"",tipo:cs,
     articulos:items().map(i=>{const t=detTxt(i.x);return `• ${i.q?i.q+" × ":""}${i.d}${t?"\n   ↳ "+t:""}`}).join("\n"),
     fechaDeseada:val("date"),horario:val("slot"),vehiculo:vehicle()});
   try{localStorage.setItem("cerquita-last",JSON.stringify({code,at:t.toLocaleString("es-NI",{dateStyle:"medium",timeStyle:"short"})}))}catch(e){}
@@ -771,7 +782,7 @@ $("f").addEventListener("submit",e=>{
   const reg=$("regMsg");
   if(API_URL){reg.textContent="Registrando su pedido en Cerquita…";
     api({action:"nuevo",pedido:{codigo:code,cliente:val("sName"),pais:val("sCountry"),whatsapp:val("sPhone"),correo:val("sMail"),
-      beneficiario:val("rName"),parentesco:val("rRel"),telBeneficiario:val("rPhone"),distrito:val("rDist"),barrio:val("rBarrio"),
+      beneficiario:val("rName"),parentesco:val("rRel"),telBeneficiario:val("rPhone"),departamento:val("rDep"),municipio:val("rMun"),distrito:$("rDistL").style.display==="none"?"":val("rDist"),barrio:val("rBarrio"),
       direccion:val("rAddr"),ubicacion:locUrl()||"",tipo:cs,articulos:artTxt,indicaciones:val("notes"),presupuesto:val("budget"),
       fechaDeseada:val("date"),horario:val("slot"),vehiculo:vehicle(),tarjeta:val("card"),pin,ck,recurrencia:val("rec")?(val("rec")==="15"?"Cada 15 días":"Cada mes"):""}})
     .then(r=>{reg.textContent=r&&r.ok?"Su pedido quedó registrado en Cerquita ✓ Envíelo también por WhatsApp para atenderle más rápido.":"No pudimos registrarlo automáticamente. Envíelo por WhatsApp."})

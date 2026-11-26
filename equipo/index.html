@@ -471,7 +471,7 @@ body.locked #gate{display:flex}
       <label><span>Cliente <span class="req">*</span></span><input id="aClient"></label>
       <label><span>WhatsApp del cliente <span class="hint">(para enviarle el PDF)</span></span><input id="aWa" type="tel" inputmode="tel"></label>
       <label>País del cliente<input id="aCountry"></label>
-      <label><span>Beneficiario en Managua <span class="req">*</span></span><input id="aBenef"></label>
+      <label><span>Beneficiario <span class="req">*</span></span><input id="aBenef"></label>
       <label class="full"><span>Descripción del encargo <span class="req">*</span></span><textarea id="aDesc"></textarea></label>
       <div class="full" id="aQuote"></div>
     </fieldset>
@@ -542,7 +542,7 @@ body.locked #gate{display:flex}
       <p class="full hint" style="margin:0">Se llenan solos si el pedido viene del Panel o fue aceptado en este dispositivo. Podés completarlos o corregirlos.</p>
       <label>País del cliente<input id="kCountry"></label>
       <label>Correo del cliente<input id="kMail" type="email"></label>
-      <label>Beneficiario en Managua<input id="kBenef"></label>
+      <label>Beneficiario<input id="kBenef"></label>
       <label>Parentesco<input id="kRel"></label>
       <label>Teléfono del beneficiario<input id="kBTel" type="tel" inputmode="tel"></label>
       <label>Zona<input id="kZone" placeholder="Barrio, distrito"></label>
@@ -643,7 +643,7 @@ body.locked #gate{display:flex}
 </section>
 <section id="vRuta">
   <h2 style="font-size:clamp(28px,4vw,40px);margin:0 0 8px">Ruta del día</h2>
-  <p style="color:var(--mute);margin:0 0 16px">Pedidos en compras o en camino y los que deben entregarse hoy, agrupados por distrito.</p>
+  <p style="color:var(--mute);margin:0 0 16px">Pedidos en compras o en camino y los que deben entregarse hoy, agrupados por zona: distritos de Managua y cada departamento.</p>
   <div class="row" style="margin:0 0 16px"><a class="btn main" id="rtAll" href="#" target="_blank" rel="noopener">Abrir ruta completa en Google Maps</a><button type="button" class="btn sec" id="rtRefresh">Actualizar</button></div>
   <div id="rtList"></div>
 </section>
@@ -865,7 +865,7 @@ $("h").addEventListener("submit",e=>{
     <div class="clock">Pedido aceptado formalmente el <b>${esc(fecha)}</b> a las <b>${esc(hora)}</b> (hora de Managua, UTC−6).</div>
     <table>
       <tr><td>Cliente</td><td>${v("aClient")}${$("aCountry").value.trim()?" · "+v("aCountry"):""}</td></tr>
-      <tr><td>Beneficiario en Managua</td><td>${v("aBenef")}</td></tr>
+      <tr><td>Beneficiario</td><td>${v("aBenef")}</td></tr>
       ${(()=>{const rs=qRows();if(!rs.some(r=>r.p))return `<tr><td>Descripción del encargo</td><td style="white-space:pre-line">${v("aDesc")}</td></tr>`;
         return `<tr><td colspan="2" style="padding:6px 0 0"><table class="qdoc"><tr><th>Artículo</th><th class="n">Cant.</th><th class="n">Precio</th><th class="n">Subtotal</th></tr>${rs.map(r=>`<tr><td>${esc(r.n)}${r.det?`<br><small>${esc(r.det)}</small>`:""}</td><td class="n">${r.q}</td><td class="n">${r.p?money(r.p):"—"}</td><td class="n">${r.p?money(r.s):"—"}</td></tr>`).join("")}</table></td></tr>`})()}
       <tr><td>Fecha estimada de entrega</td><td>${esc(ent)}</td></tr>
@@ -1054,7 +1054,7 @@ function findOrder(code){const fromList=(typeof orders!=="undefined"&&orders.fin
 const KMAP=[["kClient","cliente"],["kWa","whatsapp"],["kCountry","pais"],["kMail","correo"],["kBenef","beneficiario"],["kRel","parentesco"],["kBTel","telBeneficiario"],
   ["kAddr","direccion"],["kDesc","articulos"],["kAccepted","fechaAceptacion"],["kVeh","vehiculo"]];
 function fillPagoFrom(o,force){KMAP.forEach(([id,k])=>{if(o[k]&&(force||!$(id).value.trim()))$(id).value=o[k]});
-  const zone=[o.barrio,o.distrito].filter(Boolean).join(", ");if(zone&&(force||!$("kZone").value.trim()))$("kZone").value=zone;
+  const zone=zonaOf(o);if(zone&&(force||!$("kZone").value.trim()))$("kZone").value=zone;
   const deliv=o.fechaEntrega||[o.fechaDeseada,o.horario].filter(Boolean).join(" · ");if(deliv&&(force||!$("kDeliv").value.trim()))$("kDeliv").value=deliv;
   if(o.moneda)$("kCur").value=o.moneda;
   if(o.total){const t=String(o.total).replace(/[^\d.]/g,"");if(force||!$("kQuoted").value.trim())$("kQuoted").value=t;if(force||!$("kAmt").value.trim())$("kAmt").value=t}}
@@ -1164,7 +1164,7 @@ function renderPanel(){
       <span class="who">${esc(o.cliente)} → ${esc(o.beneficiario)} · ${esc(o.barrio)}</span><span class="hint">${esc(o.fecha)}</span></summary>
       <div class="obody"><dl>${row("Cliente",o.cliente+(o.pais?" ("+o.pais+")":""))}${row("WhatsApp cliente",o.whatsapp)}${row("Correo",o.correo)}
       ${row("Beneficiario",o.beneficiario+(o.parentesco?" ("+o.parentesco+")":""))}${row("Teléfono",o.telBeneficiario)}
-      ${row("Zona",[o.barrio,o.distrito].filter(Boolean).join(", "))}${row("Dirección",o.direccion)}${loc}
+      ${row("Zona",zonaOf(o))}${row("Dirección",o.direccion)}${loc}
       ${row("Tipo de pedido",o.tipo)}${row("Artículos",o.articulos)}${row("Indicaciones",o.indicaciones)}${row("Presupuesto",o.presupuesto)}
       ${row("Fecha y horario",[o.fechaDeseada,o.horario].filter(Boolean).join(" · "))}${row("Recurrencia",o.recurrencia)}${row("Calificación",o.calificacion?"★".repeat(+o.calificacion)+"☆".repeat(5-o.calificacion)+" ("+o.calificacion+"/5)":"")}${row("Recibió",o.recibio)}${row("Último cambio",o.ultimoCambio?o.ultimoCambio+(o.ultimoPor?" · "+o.ultimoPor:""):"")}${row("Vehículo",o.vehiculo)}${row("Tarjeta",o.tarjeta)}${row("PIN",o.pin)}
       ${row("Aceptado",o.fechaAceptacion?o.fechaAceptacion+" · "+o.aceptadoPor:"")}${row("Total cotizado",o.total?o.moneda+" "+o.total:"")}</dl>
@@ -1200,12 +1200,14 @@ $("pAlerts").addEventListener("click",async()=>{beep();
   catch(e){$("pStatus").textContent="Las alertas aparecerán en pantalla."}});
 /* ---------- Ruta del día ---------- */
 const todayISO=()=>new Date().toLocaleDateString("en-CA",{timeZone:"America/Managua"});
+function zonaOf(o){const d=o.departamento||"Managua",m=o.municipio||"";return [o.barrio,o.distrito,m,m&&m.toLowerCase()===d.toLowerCase()?"":(o.departamento||"")].filter(Boolean).join(", ")}
+function grupoOf(o){const d=o.departamento||"Managua";return d==="Managua"&&(!o.municipio||/^managua$/i.test(o.municipio))?(o.distrito?"Managua · "+o.distrito:"Managua"):(d==="Managua"?o.municipio:d+(o.municipio?" · "+o.municipio:""))}
 function geoOf(o){const u=String(o.ubicacion||"");const m=u.match(/(-?\d{1,2}\.\d{3,}),\s*(-?\d{1,3}\.\d{3,})/)||u.match(/@(-?\d{1,2}\.\d+),(-?\d{1,3}\.\d+)/);
-  return m?m[1]+","+m[2]:[o.direccion,o.barrio,"Managua, Nicaragua"].filter(Boolean).join(", ")}
+  return m?m[1]+","+m[2]:[o.direccion,o.barrio,o.municipio||"Managua",(o.departamento||"Managua"),"Nicaragua"].filter(Boolean).join(", ")}
 function renderRuta(){const hoy=todayISO();
   const list=orders.filter(o=>["Compras","Despacho"].includes(o.estado)||(o.fechaDeseada===hoy&&!["Entregado","Cancelado"].includes(o.estado)));
   if(!list.length){$("rtList").innerHTML=`<p class="hint">No hay entregas pendientes para hoy.</p>`;$("rtAll").style.display="none";return}
-  const groups={};list.forEach(o=>{(groups[o.distrito||"Sin distrito"]=groups[o.distrito||"Sin distrito"]||[]).push(o)});
+  const groups={};list.forEach(o=>{const g=grupoOf(o);(groups[g]=groups[g]||[]).push(o)});
   const ordered=Object.keys(groups).sort().flatMap(k=>groups[k]);
   const enc=encodeURIComponent,pts=ordered.slice(0,10).map(geoOf),dest=pts[pts.length-1],way=pts.slice(0,-1).join("|");
   $("rtAll").style.display="";$("rtAll").href=`https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=${enc(dest)}${way?"&waypoints="+enc(way):""}`;
@@ -1246,7 +1248,7 @@ $("bkJson").addEventListener("click",async()=>{const db=lsGet("cq-db",{}),n=Obje
   const f=new File([JSON.stringify({app:"Cerquita",tipo:"respaldo",version:1,exportado:d.toISOString(),pedidos:db},null,1)],`cerquita-respaldo-${stamp}.json`,{type:"application/json"});
   const r=await saveFile(f);$("bkMsg").textContent=r==="saved"?`Respaldo descargado ✓ (${n} pedidos). Guárdelo en un lugar seguro.`:"No se pudo descargar el respaldo."});
 $("bkCsv").addEventListener("click",async()=>{const rows=Object.values(lsGet("cq-db",{})).sort((a,b)=>(b._t||0)-(a._t||0));
-  const cols=[["codigo","Número de pedido"],["fecha","Fecha de registro"],["estado","Estado"],["cliente","Cliente"],["pais","País"],["whatsapp","WhatsApp cliente"],["correo","Correo"],["beneficiario","Beneficiario"],["parentesco","Parentesco"],["telBeneficiario","Teléfono beneficiario"],["distrito","Distrito"],["barrio","Barrio"],["direccion","Dirección"],["ubicacion","Ubicación"],["tipo","Tipo de pedido"],["articulos","Artículos"],["indicaciones","Indicaciones"],["presupuesto","Presupuesto"],["fechaDeseada","Fecha deseada"],["horario","Horario"],["vehiculo","Vehículo"],["fechaAceptacion","Fecha de aceptación"],["aceptadoPor","Aceptado por"],["moneda","Moneda"],["total","Total cotizado"]];
+  const cols=[["codigo","Número de pedido"],["fecha","Fecha de registro"],["estado","Estado"],["cliente","Cliente"],["pais","País"],["whatsapp","WhatsApp cliente"],["correo","Correo"],["beneficiario","Beneficiario"],["parentesco","Parentesco"],["telBeneficiario","Teléfono beneficiario"],["departamento","Departamento"],["municipio","Municipio"],["distrito","Distrito"],["barrio","Barrio"],["direccion","Dirección"],["ubicacion","Ubicación"],["tipo","Tipo de pedido"],["articulos","Artículos"],["indicaciones","Indicaciones"],["presupuesto","Presupuesto"],["fechaDeseada","Fecha deseada"],["horario","Horario"],["vehiculo","Vehículo"],["fechaAceptacion","Fecha de aceptación"],["aceptadoPor","Aceptado por"],["moneda","Moneda"],["total","Total cotizado"]];
   const csv="\ufeff"+[cols.map(c=>c[1]).join(";"),...rows.map(o=>cols.map(c=>csvCell(o[c[0]])).join(";"))].join("\r\n");
   const r=await saveFile(new File([csv],`cerquita-pedidos-${new Date().toISOString().slice(0,10)}.csv`,{type:"text/csv"}));
   $("bkMsg").textContent=r==="saved"?`Archivo para Excel descargado ✓ (${rows.length} pedidos).`:"No se pudo descargar el archivo."});
