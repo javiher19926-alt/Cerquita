@@ -176,6 +176,11 @@ details[open].acc .chev{transform:rotate(180deg)}
 .sdetail dt{color:var(--mute)}.sdetail dd{margin:2px 0 0;font-weight:600}
 .sdetail .st{display:inline-block;margin-left:6px;padding:2px 10px;border-radius:999px;font-size:12px;background:light-dark(#FCE3D4,#4A2A18);color:var(--coral)}
 .sdetail .st.ok{background:light-dark(#E3F5F3,#123F45);color:var(--teal)}
+.mine .mh{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin-bottom:8px}.mine .mh b{font:700 18px Sora,sans-serif}
+.mrow{all:unset;box-sizing:border-box;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:center;width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;margin-top:8px;cursor:pointer;background:var(--field)}
+.mrow:focus-visible{outline:3px solid var(--teal)}.mrow.sel{border-color:var(--teal);background:light-dark(#E3F5F3,#123F45)}
+.mrow .mc{font:700 15px Sora,sans-serif}.mrow .mb{color:var(--mute);font-size:14px}.mrow .dots{grid-column:1/3;display:flex;gap:6px}.mrow .mt{grid-column:1/-1;font-size:12px;color:var(--mute)}
+.mrow .d{width:22px;height:6px;border-radius:3px;background:var(--line)}.mrow .d.ok{background:var(--teal)}.mrow .d.nx{background:var(--coral)}
 .trustband{background:var(--card);border-top:1px solid var(--line);padding:clamp(32px,5vw,64px) max(5vw,16px)}
 .trustband .in{max-width:1240px;margin:auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:40px;align-items:start}
 @media(max-width:900px){.trustband .in{grid-template-columns:minmax(0,1fr)}}
@@ -283,6 +288,8 @@ label.btn{cursor:pointer;flex-direction:row;flex:1 1 150px;font-weight:600}label
 .phgrid button{position:absolute;top:6px;right:6px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(11,37,69,.8);color:#fff;font-size:20px;cursor:pointer}
 .proof .phs{display:grid;gap:4px}.proof .phs.n2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .proof .phs img{width:100%;height:260px;object-fit:cover;display:block}.proof .phs.n2 img{height:200px}
+.psync{font-size:14px;padding:10px 14px;border-radius:12px;margin:0 0 14px;background:var(--card);border:1px solid var(--line)}
+.psync.warn{border:2px solid var(--coral);background:light-dark(#FDF0E8,#3A2416)}
 .doc h4{font:700 13px Sora,sans-serif;letter-spacing:.4px;color:#0E8A82;margin:18px 0 2px;padding-bottom:6px;border-bottom:2px solid #0B2545}
 .doc .neg{color:#B3261E}
 .doc td{padding:8px 0;border-bottom:1px solid #E6EBF1;vertical-align:top}
@@ -592,21 +599,55 @@ const STEPS=[
   ["Gestión de compras","Preparamos los productos aprobados en nuestra tienda propia, a precios accesibles, y adquirimos en comercios aliados lo que no tengamos disponible. Toda sustitución se le consulta antes de realizarse.","Cerquita","Factura escaneada","Fecha acordada"],
   ["Despacho y traslado","El pedido sale en el vehículo adecuado a su volumen (moto, carro o pickup) hacia el domicilio del beneficiario.","Cerquita","Aviso de salida y hora estimada","Día de entrega"],
   ["Entrega verificada","El beneficiario confirma el PIN, firma el recibí conforme y califica el servicio recibido.","Beneficiario y Cerquita","Comprobante con foto, firma y hora","Al momento de la entrega"]];
-const SHORT=["Solicitud","Cotización","Pago","Compras","Despacho","Entrega"];let selStep=null;
+const SHORT=["Solicitud","Cotización","Pago","Compras","Despacho","Entrega"];let selStep=null,selOrd=0;
+const STG={"Solicitud":0,"Cotización":1,"Pago":2,"Compras":3,"Despacho":4,"Entregado":5};
+const cGet=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}};
+const cSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+(function migrate(){const last=cGet("cerquita-last",null),mis=cGet("cerquita-mis",[]);if(last&&last.code&&!mis.length){mis.push({code:last.code,at:Date.now(),estado:"Solicitud",t:0,hist:[]});cSet("cerquita-mis",mis)}})();
+const fmtAgo=t=>{if(!t)return "";const d=new Date(t*1000);return d.toLocaleString("es-NI",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})};
+function renderMis(){const mis=cGet("cerquita-mis",[]),m=$("myOrder");
+  if(!mis.length){m.classList.remove("on");m.innerHTML="";return}
+  if(selOrd>=mis.length)selOrd=0;
+  m.classList.add("on");
+  const canNotif="Notification" in window&&Notification.permission==="default";
+  m.innerHTML=`<div class="mh"><b>Mis pedidos</b><span class="hint">Se actualiza solo cuando avanza su pedido</span>${canNotif?`<button type="button" class="btn sec" id="misNotif" style="min-height:38px;padding:6px 12px;font-size:14px">Activar avisos</button>`:""}</div>`+
+    mis.slice(0,5).map((o,i)=>{const done=o.estado in STG?STG[o.estado]:-1;
+      const dots=SHORT.map((_,j)=>`<span class="d ${j<=done?"ok":j===done+1&&o.estado!=="Cancelado"?"nx":""}" title="${SHORT[j]}"></span>`).join("");
+      return `<button type="button" class="mrow ${i===selOrd?"sel":""}" data-o="${i}"><span class="mc">${esc(o.code)}</span><span class="mb">${o.benef?"Para "+esc(o.benef):""}</span>
+        <span class="chipst ${esc(o.estado)}">${esc(o.estado==="Entregado"?"Entregado ✓":o.estado)}</span><span class="dots" aria-label="Etapa ${done+1} de 6">${dots}</span>
+        <span class="mt">${o.t?"Actualizado "+esc(fmtAgo(o.t)):""}${o.total?" · Total "+esc(o.total):""}</span></button>`}).join("");
+  const nb=$("misNotif");if(nb)nb.onclick=async()=>{try{await Notification.requestPermission()}catch(e){}renderMis()};
+}
+$("myOrder").addEventListener("click",e=>{const b=e.target.closest(".mrow");if(!b)return;selOrd=+b.dataset.o;selStep=null;renderSteps();const d=$("dProceso");if(d&&!d.open){d.open=true}d&&d.scrollIntoView({behavior:"smooth",block:"start"})});
 function renderSteps(){
-  let last=null;try{last=JSON.parse(localStorage.getItem("cerquita-last")||"null")}catch(e){}
-  const cur=last?1:0;
-  if(selStep===null)selStep=cur;
-  const stOf=i=>last?(i<cur?"done":i===cur?"now":""):(i===0?"now":"");
+  const mis=cGet("cerquita-mis",[]),o=mis[selOrd]||null;
+  const done=o?(o.estado in STG?STG[o.estado]:-1):-1,cur=o?Math.min(done+1,6):0;
+  if(selStep===null)selStep=Math.min(cur,5);
+  const stOf=i=>o?(i<=done?"done":i===cur&&o.estado!=="Cancelado"?"now":""):(i===0?"now":"");
   $("stepper").innerHTML=STEPS.map((x,i)=>{const st=stOf(i);
     return `<button type="button" role="tab" class="sbtn ${st}" id="sb${i}" aria-selected="${i===selStep}" aria-controls="stepDetail" tabindex="${i===selStep?0:-1}" data-i="${i}"><span class="n" aria-hidden="true">${st==="done"?"✓":i+1}</span><span>${SHORT[i]}</span></button>`}).join("");
   const [t,d,who,out,when]=STEPS[selStep],st=stOf(selStep);
-  const tag=st==="done"?`<span class="st ok">Completada</span>`:st==="now"?`<span class="st">${last?"Etapa siguiente":"Inicie aquí"}</span>`:"";
-  $("stepDetail").innerHTML=`<div class="stage">Etapa ${selStep+1} de 6 ${tag}</div><h3>${t}</h3><p>${d}</p><dl><div><dt>Responsable</dt><dd>${who}</dd></div><div><dt>Usted recibe</dt><dd>${out}</dd></div><div><dt>Plazo</dt><dd>${when}</dd></div></dl>`;
-  const m=$("myOrder");
-  if(last){m.classList.add("on");m.innerHTML=`Su pedido <b>${esc(last.code)}</b> fue registrado el ${esc(last.at)}. <b>Etapa siguiente:</b> cotización y aceptación formal, que recibirá por WhatsApp. Las notificaciones de las etapas posteriores le llegarán por el mismo medio.`}
-  else{m.classList.remove("on");m.textContent=""}
+  const tag=st==="done"?`<span class="st ok">Completada</span>`:st==="now"?`<span class="st">${o?"Etapa siguiente":"Inicie aquí"}</span>`:"";
+  const h=o&&o.hist?o.hist.find(x=>STG[x.e]===selStep):null;
+  $("stepDetail").innerHTML=`<div class="stage">${o?"Pedido "+esc(o.code)+" · ":""}Etapa ${selStep+1} de 6 ${tag}</div><h3>${t}</h3><p>${d}</p>${h?`<p class="okc" style="margin:-6px 0 14px">Completada el ${esc(fmtAgo(h.t))}</p>`:""}<dl><div><dt>Responsable</dt><dd>${who}</dd></div><div><dt>Usted recibe</dt><dd>${out}</dd></div><div><dt>Plazo</dt><dd>${when}</dd></div></dl>`;
+  renderMis();
 }
+let syncBusy=false;
+async function clientSync(){if(syncBusy||typeof openFor!=="function")return;const mis=cGet("cerquita-mis",[]).filter(o=>o.ck);if(!mis.length)return;syncBusy=true;
+  try{const tags={};for(const o of mis)tags[await ckTag(o.ck)]=o.code;
+    const r=await fetch(`${RELAY}/${TOPIC}/json?poll=1&since=12h`);if(!r.ok)return;
+    const all=cGet("cerquita-mis",[]);let changed=[];
+    for(const ln of (await r.text()).split("\n")){if(!ln)continue;let m,pj;try{m=JSON.parse(ln);pj=JSON.parse(m.message)}catch(e){continue}
+      if(!pj||pj.v!==2||!tags[pj.k])continue;const ord=all.find(x=>x.code===tags[pj.k]);if(!ord)continue;
+      let u;try{u=await openFor(ord.ck,pj)}catch(e){continue}
+      if(!u||u.c!==ord.code||(u.t||0)<=(ord.t||0))continue;
+      ord.estado=u.e;ord.t=u.t;(ord.hist=ord.hist||[]).push({e:u.e,t:u.t});if(u.x&&u.x.total)ord.total=(u.x.moneda||"")+" "+u.x.total;changed.push(ord)}
+    if(changed.length){cSet("cerquita-mis",all);selStep=null;renderSteps();
+      const o=changed[changed.length-1],msg={"Cotización":"Su pedido fue aceptado. Revise la constancia en WhatsApp.","Pago":"Confirmamos su pago. Ya estamos preparando su pedido.","Compras":"Estamos preparando su pedido.","Despacho":"Su pedido va en camino.","Entregado":"Su pedido fue entregado y verificado.","Cancelado":"Su pedido fue cancelado."}[o.estado]||"Su pedido avanzó.";
+      try{if("Notification" in window&&Notification.permission==="granted")new Notification("Cerquita · "+o.code,{body:msg,icon:"icons/icon-192.png"})}catch(e){}}
+  }catch(e){}finally{syncBusy=false}}
+setTimeout(clientSync,1500);setInterval(()=>{if(document.visibilityState==="visible")clientSync()},60000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")clientSync()});
 renderSteps();
 $("stepper").addEventListener("click",e=>{const b=e.target.closest(".sbtn");if(b){selStep=+b.dataset.i;renderSteps();$("sb"+selStep).focus()}});
 $("stepper").addEventListener("keydown",e=>{const k={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];if(!k)return;e.preventDefault();selStep=(selStep+k+6)%6;renderSteps();$("sb"+selStep).focus()});
@@ -637,6 +678,8 @@ $("f").addEventListener("submit",e=>{
     articulos:items().map(i=>{const t=detTxt(i.x);return `• ${i.q?i.q+" × ":""}${i.d}${t?"\n   ↳ "+t:""}`}).join("\n"),
     fechaDeseada:val("date"),horario:val("slot"),vehiculo:vehicle()});
   try{localStorage.setItem("cerquita-last",JSON.stringify({code,at:t.toLocaleString("es-NI",{dateStyle:"medium",timeStyle:"short"})}))}catch(e){}
+  const ck=btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16)))).replace(/[+/=]/g,"");
+  {const mis=cGet("cerquita-mis",[]);mis.unshift({code,ck,benef:val("rName"),at:Date.now(),estado:"Solicitud",t:Math.floor(Date.now()/1000),hist:[{e:"Solicitud",t:Math.floor(Date.now()/1000)}]});cSet("cerquita-mis",mis.slice(0,20));selOrd=0;selStep=null}
   renderSteps();
   $("oCode").textContent=code;$("oPin").textContent=pin;
   $("wa").href=`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(lastText)}`;
@@ -647,13 +690,14 @@ $("f").addEventListener("submit",e=>{
     api({action:"nuevo",pedido:{codigo:code,cliente:val("sName"),pais:val("sCountry"),whatsapp:val("sPhone"),correo:val("sMail"),
       beneficiario:val("rName"),parentesco:val("rRel"),telBeneficiario:val("rPhone"),distrito:val("rDist"),barrio:val("rBarrio"),
       direccion:val("rAddr"),ubicacion:locUrl()||"",tipo:cs,articulos:artTxt,indicaciones:val("notes"),presupuesto:val("budget"),
-      fechaDeseada:val("date"),horario:val("slot"),vehiculo:vehicle(),tarjeta:val("card"),pin}})
+      fechaDeseada:val("date"),horario:val("slot"),vehiculo:vehicle(),tarjeta:val("card"),pin,ck}})
     .then(r=>{reg.textContent=r&&r.ok?"Tu pedido quedó registrado en Cerquita ✓ Envialo también por WhatsApp para atenderte más rápido.":"No pudimos registrarlo automáticamente. Envialo por WhatsApp."})
     .catch(()=>{reg.textContent="No pudimos registrarlo automáticamente. Envialo por WhatsApp."});
   } else reg.textContent="";
 });
 /* ---------- Envío cifrado de pedidos ---------- */
 const RELAY="https://ntfy.sh",TOPIC="cq-ef817c85b1227de3febc071a9a987fa348c5",TEAM_PUB={"kty": "EC", "crv": "P-256", "x": "LVpou9kMsnxyoDoxeUrwFGvku7xZi9pIHeIxWm2h6mk", "y": "4AD8t2bQjcrP0_jS06W1HlxeYe-QKcGzxFLttl5wqqA"};
+const unB64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 const B64=u=>{let s="";for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(s)};
 async function packBytes(str){const raw=new TextEncoder().encode(str);
   if(window.CompressionStream){try{const st=new Blob([raw]).stream().pipeThrough(new CompressionStream("deflate-raw"));return {z:1,b:new Uint8Array(await new Response(st).arrayBuffer())}}catch(e){}}
@@ -670,6 +714,16 @@ async function relayPublish(obj,title,quiet){const payload=await seal(obj),id=Ma
     const r=await fetch(RELAY+"/",{method:"POST",body:JSON.stringify(Object.assign({topic:TOPIC,message:msg,title:title||"Cerquita"},quiet?{priority:1}:{priority:4,tags:["package"]}))});
     if(!r.ok)throw new Error("relay "+r.status)}
   return true}
+
+/* Actualizaciones de estado para el cliente (cifradas con la llave de su pedido) */
+const enc=t=>new TextEncoder().encode(t);
+async function ckKey(ck){return crypto.subtle.importKey("raw",await crypto.subtle.digest("SHA-256",enc("k:"+ck)),"AES-GCM",false,["encrypt","decrypt"])}
+async function ckTag(ck){return B64(new Uint8Array(await crypto.subtle.digest("SHA-256",enc("t:"+ck))).slice(0,9)).replace(/[+/=]/g,"")}
+async function sealFor(ck,obj){const iv=crypto.getRandomValues(new Uint8Array(12));
+  const ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv},await ckKey(ck),enc(JSON.stringify(obj))));
+  return JSON.stringify({v:2,k:await ckTag(ck),i:B64(iv),c:B64(ct)})}
+async function openFor(ck,o){return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:unB64(o.i)},await ckKey(ck),unB64(o.c))))}
+async function publishRaw(msg,title){const r=await fetch(RELAY+"/",{method:"POST",body:JSON.stringify({topic:TOPIC,message:msg,title:title||"Cerquita",priority:1})});if(!r.ok)throw new Error("relay "+r.status)}
 
 async function api(body){if(body.action==="nuevo"){await relayPublish({t:"pedido",p:body.pedido},"Nuevo pedido "+body.pedido.codigo);return {ok:true}}return {ok:false,error:"accion"}}
 const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}};

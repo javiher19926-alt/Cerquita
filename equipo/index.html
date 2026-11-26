@@ -176,6 +176,11 @@ details[open].acc .chev{transform:rotate(180deg)}
 .sdetail dt{color:var(--mute)}.sdetail dd{margin:2px 0 0;font-weight:600}
 .sdetail .st{display:inline-block;margin-left:6px;padding:2px 10px;border-radius:999px;font-size:12px;background:light-dark(#FCE3D4,#4A2A18);color:var(--coral)}
 .sdetail .st.ok{background:light-dark(#E3F5F3,#123F45);color:var(--teal)}
+.mine .mh{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin-bottom:8px}.mine .mh b{font:700 18px Sora,sans-serif}
+.mrow{all:unset;box-sizing:border-box;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:center;width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;margin-top:8px;cursor:pointer;background:var(--field)}
+.mrow:focus-visible{outline:3px solid var(--teal)}.mrow.sel{border-color:var(--teal);background:light-dark(#E3F5F3,#123F45)}
+.mrow .mc{font:700 15px Sora,sans-serif}.mrow .mb{color:var(--mute);font-size:14px}.mrow .dots{grid-column:1/3;display:flex;gap:6px}.mrow .mt{grid-column:1/-1;font-size:12px;color:var(--mute)}
+.mrow .d{width:22px;height:6px;border-radius:3px;background:var(--line)}.mrow .d.ok{background:var(--teal)}.mrow .d.nx{background:var(--coral)}
 .trustband{background:var(--card);border-top:1px solid var(--line);padding:clamp(32px,5vw,64px) max(5vw,16px)}
 .trustband .in{max-width:1240px;margin:auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:40px;align-items:start}
 @media(max-width:900px){.trustband .in{grid-template-columns:minmax(0,1fr)}}
@@ -283,6 +288,8 @@ label.btn{cursor:pointer;flex-direction:row;flex:1 1 150px;font-weight:600}label
 .phgrid button{position:absolute;top:6px;right:6px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(11,37,69,.8);color:#fff;font-size:20px;cursor:pointer}
 .proof .phs{display:grid;gap:4px}.proof .phs.n2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .proof .phs img{width:100%;height:260px;object-fit:cover;display:block}.proof .phs.n2 img{height:200px}
+.psync{font-size:14px;padding:10px 14px;border-radius:12px;margin:0 0 14px;background:var(--card);border:1px solid var(--line)}
+.psync.warn{border:2px solid var(--coral);background:light-dark(#FDF0E8,#3A2416)}
 .doc h4{font:700 13px Sora,sans-serif;letter-spacing:.4px;color:#0E8A82;margin:18px 0 2px;padding-bottom:6px;border-bottom:2px solid #0B2545}
 .doc .neg{color:#B3261E}
 .doc td{padding:8px 0;border-bottom:1px solid #E6EBF1;vertical-align:top}
@@ -589,7 +596,21 @@ body.locked #gate{display:flex}
       <button type="button" class="btn sec" id="pOut">Salir</button>
     </div>
     <p class="hint" id="pStatus" aria-live="polite" style="margin:0 0 12px"></p>
+    <div id="pSync" class="psync" aria-live="polite"></div>
     <div id="pList"></div>
+    <details class="acc" id="pBackup" style="margin-top:22px">
+      <summary><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 19h16"/></svg></span><span class="tx"><span class="tt">Respaldo de pedidos</span><span class="ss">Descargue una copia o páselos a otro teléfono</span></span><svg class="chev" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="panel">
+        <p style="margin:0 0 14px">Los pedidos se guardan en este teléfono. Descargue un respaldo al menos una vez por semana y guárdelo en su correo o en Google Drive.</p>
+        <div class="row" style="margin:0">
+          <button type="button" class="btn main" id="bkJson">Descargar respaldo</button>
+          <button type="button" class="btn sec" id="bkCsv">Exportar a Excel</button>
+          <label class="btn sec" for="bkFile" role="button">Restaurar respaldo</label>
+          <input id="bkFile" class="vh-input" type="file" accept="application/json,.json">
+        </div>
+        <p class="hint" id="bkMsg" style="margin:12px 0 0" aria-live="polite"></p>
+      </div>
+    </details>
   </div>
 </section>
 <div class="toast" id="toast" role="status"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7FD8CF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><span id="toastTx"></span><a href="#panel" id="toastGo">Ver</a></div>
@@ -603,6 +624,7 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 /* ---------- Envío cifrado de pedidos ---------- */
 const RELAY="https://ntfy.sh",TOPIC="cq-ef817c85b1227de3febc071a9a987fa348c5",TEAM_PUB={"kty": "EC", "crv": "P-256", "x": "LVpou9kMsnxyoDoxeUrwFGvku7xZi9pIHeIxWm2h6mk", "y": "4AD8t2bQjcrP0_jS06W1HlxeYe-QKcGzxFLttl5wqqA"};
+const unB64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 const B64=u=>{let s="";for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(s)};
 async function packBytes(str){const raw=new TextEncoder().encode(str);
   if(window.CompressionStream){try{const st=new Blob([raw]).stream().pipeThrough(new CompressionStream("deflate-raw"));return {z:1,b:new Uint8Array(await new Response(st).arrayBuffer())}}catch(e){}}
@@ -619,9 +641,18 @@ async function relayPublish(obj,title,quiet){const payload=await seal(obj),id=Ma
     const r=await fetch(RELAY+"/",{method:"POST",body:JSON.stringify(Object.assign({topic:TOPIC,message:msg,title:title||"Cerquita"},quiet?{priority:1}:{priority:4,tags:["package"]}))});
     if(!r.ok)throw new Error("relay "+r.status)}
   return true}
+
+/* Actualizaciones de estado para el cliente (cifradas con la llave de su pedido) */
+const enc=t=>new TextEncoder().encode(t);
+async function ckKey(ck){return crypto.subtle.importKey("raw",await crypto.subtle.digest("SHA-256",enc("k:"+ck)),"AES-GCM",false,["encrypt","decrypt"])}
+async function ckTag(ck){return B64(new Uint8Array(await crypto.subtle.digest("SHA-256",enc("t:"+ck))).slice(0,9)).replace(/[+/=]/g,"")}
+async function sealFor(ck,obj){const iv=crypto.getRandomValues(new Uint8Array(12));
+  const ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv},await ckKey(ck),enc(JSON.stringify(obj))));
+  return JSON.stringify({v:2,k:await ckTag(ck),i:B64(iv),c:B64(ct)})}
+async function openFor(ck,o){return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:unB64(o.i)},await ckKey(ck),unB64(o.c))))}
+async function publishRaw(msg,title){const r=await fetch(RELAY+"/",{method:"POST",body:JSON.stringify({topic:TOPIC,message:msg,title:title||"Cerquita",priority:1})});if(!r.ok)throw new Error("relay "+r.status)}
 /* ---------- Base de pedidos dentro de la app ---------- */
 const PRIV_ENC={"s": "blTtQ65Pw2qKLLKgryRB4Q==", "i": "4Ta6ScJcXYHgaqV7", "c": "S6im09YGQjm5Y3D44iTPACF13wxfQpfB3XgIKJUno2kZpeXaPaD1zlsCDIGi9R0pA3spVtNSgDau/6uBcy6dYtqiN0DzbnR3swmWFMNfAoU66yforiRCF0Dm4G8eBfuvJLGANtavjmxj7hvvFdQZ3M1ycyG3kYdxMvtvkw2rRMT+7xws6Wyn1ow/benU4sdOYXXxNXSkfN9wvO3e38mH3w66y8OoUUU5p3tBi0RX02CnSYE95CKE3KGH0kDhyyXrfBnLJRkn0DlGPl4X+gY04sNThnQateHYv3Mk3ew+SSeWfsM="};
-const unB64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 let PRIV=null;
 async function openPriv(pass){if(PRIV)return PRIV;
   const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pass),"PBKDF2",false,["deriveKey"]);
@@ -653,12 +684,15 @@ async function syncFeed(){if(syncing)return syncing;syncing=(async()=>{
     try{const pj=JSON.parse(payload);if(pj&&pj.m&&pj.d!=null){const c=chunks[pj.m]||(chunks[pj.m]={n:pj.n,p:{},t:m.time});c.p[pj.p]=pj.d;
         if(Object.keys(c.p).length<c.n)continue;payload=Array.from({length:c.n},(_,i)=>c.p[i]).join("");delete chunks[pj.m]}}catch(e){}
     try{applyEv(db,await unseal(payload),m.time)}catch(e){}}
-  dbSet(db);lsSet("cq-since",maxT);lsSet("cq-seen-ids",[...seenIds].slice(-800));
+  dbSet(db);lsSet("cq-since",maxT);lsSet("cq-lastsync",Date.now());lsSet("cq-seen-ids",[...seenIds].slice(-800));
   const now=Date.now()/1000;for(const k of Object.keys(chunks))if(now-chunks[k].t>43200)delete chunks[k];lsSet("cq-chunks",chunks);
 })();try{await syncing}finally{syncing=null}}
 function listLocal(){return Object.values(dbGet()).filter(o=>o.codigo).sort((a,b)=>(b._t||0)-(a._t||0))}
 async function teamUpdate(codigo,estado,extra){const t=Math.floor(Date.now()/1000),db=dbGet();
   applyEv(db,{t:"estado",c:codigo,e:estado,x:extra||{}},t);dbSet(db);
+  const rec=db[codigo]||{};
+  if(rec.ck){const cx=estado==="Cotización"&&extra?{moneda:extra.moneda,total:extra.total}:{};
+    sealFor(rec.ck,{c:codigo,e:estado,t,x:cx}).then(m=>publishRaw(m,"Actualización de pedido")).catch(()=>{})}
   try{await relayPublish({t:"estado",c:codigo,e:estado,x:extra||{}},"Actualización interna",true);return {ok:true}}
   catch(e){return {ok:true,offline:true}}}
 async function api(body){
@@ -720,6 +754,7 @@ $("g").addEventListener("submit",e=>{
     `<div class="ft"><b style="font-family:Sora,sans-serif;color:var(--ink)">cerquita</b> · Lo pedís desde lejos. Lo ves llegar.</div>`;
   proofText=[`*Cerquita · Entrega verificada ✓*`,`Paso 6 de 6 · Pedido completado`,`Pedido: ${code}`,`Recibí conforme: ${name}`,`Cédula: ${maskCed(ced)}`,`Fecha y hora: ${when}`,
     `PIN: verificado`,`Calificación: ${stars} (${rate}/5)`,com?`Comentario: "${com}"`:"",``,`Lo pedís desde lejos. Lo ves llegar.`].filter(Boolean).join("\n");
+  if(API_URL&&pKey)api({action:"estado",key:pKey,codigo:code,estado:"Entregado"}).then(r=>{if(r&&r.ok)loadOrders()}).catch(()=>{});
   $("g").style.display="none";$("proofWrap").style.display="block";$("proofWrap").scrollIntoView({behavior:"smooth",block:"start"});
 });
 $("pCopy").addEventListener("click",()=>sendPdf($("proof"),"Comprobante-"+($("dCode").value.trim().toUpperCase()||"entrega")+".pdf",$("dWa").value,proofText,$("pMsg"),"Comprobante de entrega verificada"));
@@ -818,7 +853,7 @@ function aviso(){const c=$("uCode").value.trim().toUpperCase()||"(pedido)",s=+$(
   return [`*Cerquita · Pedido ${c}*`,L[0],``,L[1],``,L[2]].join("\n")}
 ["uCode","uStep","uVeh","uEta"].forEach(i=>{$(i).addEventListener("input",()=>{$("uOut").textContent=aviso()});$(i).addEventListener("change",()=>{$("uOut").textContent=aviso()})});
 $("uOut").textContent=aviso();
-$("uCopy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(aviso());$("uCopy").textContent="Aviso copiado ✓"}catch(e){$("uCopy").textContent="Copiá el texto de abajo"}setTimeout(()=>{$("uCopy").textContent="Copiar aviso"},2500)});
+$("uCopy").addEventListener("click",async()=>{const _c=$("uCode").value.trim().toUpperCase(),_e={3:"Pago",4:"Compras",5:"Despacho"}[$("uStep").value];if(API_URL&&pKey&&/^CQ-\d{6}-\d{4}$/.test(_c)&&_e)api({action:"estado",key:pKey,codigo:_c,estado:_e}).catch(()=>{});try{await navigator.clipboard.writeText(aviso());$("uCopy").textContent="Aviso copiado ✓"}catch(e){$("uCopy").textContent="Copiá el texto de abajo"}setTimeout(()=>{$("uCopy").textContent="Copiar aviso"},2500)});
 
 /* ---------- Recibo oficial de pago ---------- */
 function letras(n){
@@ -1047,7 +1082,7 @@ async function loadOrders(){
         toast(t);beep();try{if("Notification"in window&&Notification.permission==="granted")new Notification("Cerquita",{body:t})}catch(e){}}}
     known=new Set(orders.map(o=>o.codigo));
     document.title=nuevos.length?`(${nuevos.length}) Nuevos pedidos · Cerquita`:baseTitle;
-    $("pStatus").textContent="Actualizado a las "+new Date().toLocaleTimeString("es-NI",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+    $("pStatus").textContent="Actualizado a las "+new Date().toLocaleTimeString("es-NI",{hour:"2-digit",minute:"2-digit",second:"2-digit"});renderSync(!!r.offline);
     if(document.body.dataset.view==="panel")renderPanel();
   }catch(e){$("pStatus").textContent="No se pudo conectar con el servicio de pedidos. Reintentando…"}
 }
@@ -1105,6 +1140,28 @@ $("pAlerts").addEventListener("click",async()=>{beep();
   try{if(!("Notification"in window)){$("pStatus").textContent="Este navegador no permite notificaciones; las alertas sonarán y aparecerán en pantalla.";return}
     const p=await Notification.requestPermission();$("pStatus").textContent=p==="granted"?"Alertas activadas ✓":"Las notificaciones quedaron bloqueadas; igual verás el aviso en pantalla."}
   catch(e){$("pStatus").textContent="Las alertas aparecerán en pantalla."}});
+function renderSync(offline){const el=$("pSync");if(!el)return;let last=0;try{last=+JSON.parse(localStorage.getItem("cq-lastsync")||"0")}catch(e){}
+  if(!last){el.className="psync";el.textContent=offline?"Sin conexión con el servicio de pedidos. Reintentando…":"";return}
+  const h=(Date.now()-last)/3600000,ago=h<1?Math.max(1,Math.round(h*60))+" min":Math.floor(h)+" h";
+  el.className="psync"+(h>=8||offline?" warn":"");
+  el.textContent=(offline?"Sin conexión en este momento. ":"")+"Última sincronización: hace "+ago+"."+(h>=8?" Abra la app con frecuencia: los pedidos nuevos se conservan 12 horas en el servicio de envío.":"")}
+setInterval(()=>renderSync(false),60000);
+function csvCell(v){v=v==null?"":String(v);return /[";\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+$("bkJson").addEventListener("click",async()=>{const db=lsGet("cq-db",{}),n=Object.keys(db).length;
+  const d=new Date(),stamp=d.toISOString().slice(0,10);
+  const f=new File([JSON.stringify({app:"Cerquita",tipo:"respaldo",version:1,exportado:d.toISOString(),pedidos:db},null,1)],`cerquita-respaldo-${stamp}.json`,{type:"application/json"});
+  const r=await saveFile(f);$("bkMsg").textContent=r==="saved"?`Respaldo descargado ✓ (${n} pedidos). Guárdelo en un lugar seguro.`:"No se pudo descargar el respaldo."});
+$("bkCsv").addEventListener("click",async()=>{const rows=Object.values(lsGet("cq-db",{})).sort((a,b)=>(b._t||0)-(a._t||0));
+  const cols=[["codigo","Número de pedido"],["fecha","Fecha de registro"],["estado","Estado"],["cliente","Cliente"],["pais","País"],["whatsapp","WhatsApp cliente"],["correo","Correo"],["beneficiario","Beneficiario"],["parentesco","Parentesco"],["telBeneficiario","Teléfono beneficiario"],["distrito","Distrito"],["barrio","Barrio"],["direccion","Dirección"],["ubicacion","Ubicación"],["tipo","Tipo de pedido"],["articulos","Artículos"],["indicaciones","Indicaciones"],["presupuesto","Presupuesto"],["fechaDeseada","Fecha deseada"],["horario","Horario"],["vehiculo","Vehículo"],["fechaAceptacion","Fecha de aceptación"],["aceptadoPor","Aceptado por"],["moneda","Moneda"],["total","Total cotizado"]];
+  const csv="\ufeff"+[cols.map(c=>c[1]).join(";"),...rows.map(o=>cols.map(c=>csvCell(o[c[0]])).join(";"))].join("\r\n");
+  const r=await saveFile(new File([csv],`cerquita-pedidos-${new Date().toISOString().slice(0,10)}.csv`,{type:"text/csv"}));
+  $("bkMsg").textContent=r==="saved"?`Archivo para Excel descargado ✓ (${rows.length} pedidos).`:"No se pudo descargar el archivo."});
+$("bkFile").addEventListener("change",async()=>{const f=$("bkFile").files[0];$("bkFile").value="";if(!f)return;
+  try{const data=JSON.parse(await f.text());if(!data||data.app!=="Cerquita"||!data.pedidos)throw new Error("formato");
+    const db=lsGet("cq-db",{});let nuevos=0,act=0;
+    for(const [c,o] of Object.entries(data.pedidos)){if(!db[c]){db[c]=o;nuevos++}else if((o._st||0)>(db[c]._st||0)){db[c]=Object.assign({},db[c],o);act++}}
+    lsSet("cq-db",db);$("bkMsg").textContent=`Respaldo restaurado ✓ ${nuevos} pedidos agregados y ${act} actualizados.`;loadOrders()}
+  catch(e){$("bkMsg").textContent="Ese archivo no es un respaldo válido de Cerquita."}});
 startPolling();
 
 async function sha(t){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
