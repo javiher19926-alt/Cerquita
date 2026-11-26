@@ -366,6 +366,7 @@ body[data-view=entrega] #vEntrega{display:block}
 .top{padding-top:max(20px,env(safe-area-inset-top))}
 .instbtn{display:none;font:600 14px Inter,sans-serif;min-height:40px;padding:8px 14px;border-radius:999px;border:1.5px solid rgba(247,245,240,.5);background:transparent;color:#F7F5F0;cursor:pointer}
 .instbtn.on{display:inline-flex}
+.shopts{display:grid;gap:10px}.shopt{display:block;width:100%;text-align:left;padding:12px 14px;min-height:56px}.shopt b{display:block;font-size:15px}.shopt small{display:block;font-weight:400;color:var(--muted);font-size:12.5px;margin-top:2px}
 .modal{position:fixed;inset:0;background:rgba(11,37,69,.55);display:none;align-items:flex-end;justify-content:center;z-index:60;padding:16px}
 .modal.on{display:flex}
 .modal .box{background:var(--card);color:var(--ink);border-radius:18px;max-width:420px;width:100%;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
@@ -392,6 +393,7 @@ body.locked #gate{display:flex}
   <svg width="40" height="40" viewBox="0 0 120 120" aria-hidden="true"><path d="M88.3 26.3 A44 44 0 1 0 88.3 93.7" fill="none" stroke="#F7F5F0" stroke-width="15" stroke-linecap="round"/><circle cx="88.3" cy="26.3" r="10" fill="#13A89E"/><path d="M60 76 C 45 65, 42 55, 49 49 C 54 45, 60 48, 60 53 C 60 48, 66 45, 71 49 C 78 55, 75 65, 60 76 Z" fill="#F08A4B"/></svg>
   <span class="brand">cerquita</span><span class="eq">Equipo</span>
   <button type="button" class="instbtn" id="instBtn">Instalar app</button>
+  <button type="button" class="instbtn on" id="shareBtn">Compartir app</button>
   <button type="button" class="instbtn" id="bioBtn">Activar huella</button>
   <button type="button" class="instbtn on" id="userBtn" title="Cambiar de usuario"></button>
   <button type="button" class="instbtn on" id="lockBtn">Cerrar sesión</button>
@@ -670,6 +672,11 @@ body.locked #gate{display:flex}
 </section>
 <div class="toast" id="toast" role="status"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7FD8CF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><span id="toastTx"></span><a href="#panel" id="toastGo">Ver</a></div>
 <footer>cerquita · Equipo · Uso interno</footer>
+<div class="modal" id="shModal" role="dialog" aria-modal="true" aria-labelledby="shT"><div class="box">
+  <h3 id="shT" style="font-size:20px">Compartir la app</h3>
+  <p style="margin:0 0 14px;color:var(--muted);text-align:justify">Envíe la app por WhatsApp u otra aplicación. En Android se instala con el archivo APK; en iPhone o computadora se usa desde el enlace web.</p>
+  <div class="shopts" id="shOpts"></div>
+  <button type="button" class="btn" id="shClose" style="width:100%;margin-top:10px">Cerrar</button></div></div>
 <script>
 {
 const WA_NUMBER = "50587072125";
@@ -2645,6 +2652,21 @@ setInterval(()=>{const n=orders.filter(o=>o.estado==="Solicitud").length;$("navN
 let deferredInstall=null;
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;$("instBtn").classList.add("on")});
 $("instBtn").addEventListener("click",async()=>{if(deferredInstall){deferredInstall.prompt();deferredInstall=null;$("instBtn").classList.remove("on")}});
+
+const REL="https://github.com/javiher19926-alt/Cerquita/releases/download/apk/",WEB="https://javiher19926-alt.github.io/Cerquita/";
+const SHARE={cli:{t:"Cerquita",x:`Le recomiendo Cerquita: compras y encargos de confianza en toda Nicaragua, con entrega verificada.\n\nAndroid (instalar la app): ${REL}Cerquita.apk\niPhone o computadora: ${WEB}`},
+  eq:{t:"Cerquita Equipo",x:`App Cerquita Equipo para gestionar pedidos.\n\nAndroid (instalar la app): ${REL}Cerquita-Equipo.apk\nNavegador: ${WEB}equipo/\n\nPara entrar necesita su nombre y la clave del equipo.`}};
+const ANDR=window.CerquitaAndroid,TEAM=!!document.getElementById("lockBtn");
+async function shareTxt(o){if(ANDR&&ANDR.shareText){ANDR.shareText(o.x);return}
+  if(navigator.share&&!ANDR)try{await navigator.share({title:o.t,text:o.x});return}catch(e){if(e&&e.name==="AbortError")return}
+  window.open("https://wa.me/?text="+encodeURIComponent(o.x),"_blank","noopener")}
+function shOpt(lbl,sub,fn){const b=document.createElement("button");b.type="button";b.className="btn shopt";b.innerHTML=`<b>${lbl}</b><small>${sub}</small>`;b.onclick=()=>{$("shModal").classList.remove("on");fn()};$("shOpts").appendChild(b)}
+$("shareBtn").addEventListener("click",()=>{$("shOpts").innerHTML="";
+  if(ANDR&&ANDR.shareApk)shOpt(TEAM?"Enviar el archivo APK de Cerquita Equipo":"Enviar el archivo APK","Se envía la app instalada en este teléfono, lista para instalar",()=>ANDR.shareApk());
+  shOpt(TEAM?"Enviar el enlace de la app para clientes":"Enviar el enlace de la app","Enlace de descarga para Android y enlace web para iPhone",()=>shareTxt(SHARE.cli));
+  if(TEAM)shOpt("Enviar el enlace de Cerquita Equipo","Para un nuevo integrante del equipo",()=>shareTxt(SHARE.eq));
+  $("shModal").classList.add("on")});
+$("shClose").addEventListener("click",()=>$("shModal").classList.remove("on"));
 
 if("serviceWorker" in navigator&&location.protocol==="https:"){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
 }

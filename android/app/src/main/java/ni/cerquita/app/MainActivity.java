@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             "fetch(a.href).then(function(r){return r.blob()}).then(function(b){return rd(b).then(function(d){CerquitaAndroid.save(d,n,b.type||'application/octet-stream')})})" +
             ".catch(function(){CerquitaAndroid.toast('No se pudo guardar el archivo.')})},true);" +
             "navigator.canShare=function(d){return !!(d&&d.files&&d.files.length)};" +
-            "navigator.share=function(d){var f=d&&d.files&&d.files[0];if(!f)return Promise.reject(new Error('sin archivo'));" +
+            "navigator.share=function(d){var f=d&&d.files&&d.files[0];if(!f){CerquitaAndroid.shareText([d&&d.text,d&&d.url].filter(Boolean).join('\\n'));return Promise.resolve()}" +
             "return rd(f).then(function(x){CerquitaAndroid.share(x,f.name||'archivo',f.type||'application/octet-stream',(d.text||d.title||''))})};" +
             "})();";
 
@@ -304,6 +304,45 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(chooser);
             } catch (Exception e) {
                 MainActivity.this.toast("No se pudo compartir el archivo.");
+            }
+        }
+
+        @JavascriptInterface
+        public void shareText(String text) {
+            Intent send = new Intent(Intent.ACTION_SEND);
+            send.setType("text/plain");
+            send.putExtra(Intent.EXTRA_TEXT, text == null ? "" : text);
+            Intent chooser = Intent.createChooser(send, "Compartir");
+            chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(chooser);
+        }
+
+        @JavascriptInterface
+        public void shareApk() {
+            try {
+                File src = new File(getApplicationInfo().sourceDir);
+                File dir = new File(getCacheDir(), "compartir");
+                if (!dir.exists()) dir.mkdirs();
+                String name = getString(R.string.app_name).replace(' ', '-') + ".apk";
+                File f = new File(dir, name);
+                try (java.io.FileInputStream in = new java.io.FileInputStream(src);
+                     FileOutputStream out = new FileOutputStream(f)) {
+                    byte[] buf = new byte[65536];
+                    int n;
+                    while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+                }
+                Uri uri = FileProvider.getUriForFile(MainActivity.this, getPackageName() + ".files", f);
+                Intent send = new Intent(Intent.ACTION_SEND);
+                send.setType("application/vnd.android.package-archive");
+                send.putExtra(Intent.EXTRA_STREAM, uri);
+                send.putExtra(Intent.EXTRA_TEXT, "Instale " + getString(R.string.app_name)
+                        + ": abra el archivo y permita instalar apps de origen desconocido.");
+                send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                Intent chooser = Intent.createChooser(send, "Enviar la app por");
+                chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(chooser);
+            } catch (Exception e) {
+                MainActivity.this.toast("No se pudo preparar el archivo de la app.");
             }
         }
 
