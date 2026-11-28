@@ -7,9 +7,9 @@ for sid, _, text in json.load(open("tts/guion.json")):
     parts = [p for p in re.split(r"(?<=[.!?:…])\s+", text) if p.strip()]
     audio, marks, t = [], [], 0.0
     for p in parts:
-        chunk = [np.asarray(a) for _, _, a in pipe(p, voice="ef_dora", speed=0.95)]
+        chunk = [np.asarray(a) for _, _, a in pipe(p, voice="ef_dora", speed=1.04)]
         a = np.concatenate(chunk) if chunk else np.zeros(1)
-        gap = np.zeros(int(SR * (0.45 if p.endswith(("...", "…")) else 0.28)))
+        gap = np.zeros(int(SR * (0.32 if p.endswith(("...", "…")) else 0.16)))
         marks.append([round(t, 3), round(t + len(a) / SR, 3), p])
         audio += [a, gap]; t += (len(a) + len(gap)) / SR
     sf.write(f"tts/out/{sid}.wav", np.concatenate(audio), SR)
