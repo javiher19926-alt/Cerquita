@@ -516,7 +516,7 @@ body.locked #gate{display:flex}
     </fieldset>
   </form>
   <div id="docWrap" style="display:none">
-    <article class="doc" id="doc"></article>
+    <div class="vwrap"><div class="voucher dvou" id="doc"></div></div>
     <div class="row">
       <button type="button" class="btn main" id="dCopy"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 14h6M9 17h4"/></svg>Enviar PDF por WhatsApp</button>
       <button type="button" class="btn sec" id="dDown">Descargar PDF</button>
@@ -2178,37 +2178,40 @@ $("h").addEventListener("submit",e=>{
   const cur=$("aCur").value,P=num("aProd"),S=num("aShip"),Fe=num("aFee"),T=P+S+Fe;
   const ent=$("aDate").value?new Date($("aDate").value+"T12:00:00").toLocaleDateString("es-NI",{day:"numeric",month:"long",year:"numeric"}):"Por confirmar";
   const v=id=>esc($(id).value.trim()),bank=$("aBank").value.trim();
-  $("doc").innerHTML=`<header class="dh"><svg width="46" height="46" viewBox="0 0 120 120" aria-hidden="true"><path d="M88.3 26.3 A44 44 0 1 0 88.3 93.7" fill="none" stroke="#F7F5F0" stroke-width="15" stroke-linecap="round"/><circle cx="88.3" cy="26.3" r="10" fill="#13A89E"/><path d="M60 76 C 45 65, 42 55, 49 49 C 54 45, 60 48, 60 53 C 60 48, 66 45, 71 49 C 78 55, 75 65, 60 76 Z" fill="#F08A4B"/></svg>
-    <div><div class="bn">cerquita</div><div style="font-size:13px;color:#7FD8CF">Compras de confianza · Managua, Nicaragua</div></div>
-    <div class="meta">Documento N.º<br><b>${esc(docNo)}</b></div></header>
-  <div class="db">
-    <h3>CONSTANCIA DE ACEPTACIÓN DE PEDIDO</h3>
-    <p class="sub">Referencia del pedido: ${esc(code)}</p>
-    <div class="clock">Pedido aceptado formalmente el <b>${esc(fecha)}</b> a las <b>${esc(hora)}</b> (hora de Managua, UTC−6).</div>
-    <table>
-      <tr><td>Cliente</td><td>${v("aClient")}${$("aCountry").value.trim()?" · "+v("aCountry"):""}</td></tr>
-      <tr><td>Beneficiario</td><td>${v("aBenef")}</td></tr>
-      ${(()=>{const rs=qRows();if(!rs.some(r=>r.p))return `<tr><td>Descripción del encargo</td><td style="white-space:pre-line">${v("aDesc")}</td></tr>`;
-        return `<tr><td colspan="2" style="padding:6px 0 0"><table class="qdoc"><tr><th>Artículo</th><th class="n">Cant.</th><th class="n">Precio</th><th class="n">Subtotal</th></tr>${rs.map(r=>`<tr><td>${esc(r.n)}${r.det?`<br><small>${esc(r.det)}</small>`:""}</td><td class="n">${r.q}</td><td class="n">${r.p?money(r.p):"—"}</td><td class="n">${r.p?money(r.s):"—"}</td></tr>`).join("")}</table></td></tr>`})()}
-      <tr><td>Fecha estimada de entrega</td><td>${esc(ent)}</td></tr>
-      <tr><td>Productos</td><td class="n">${cur} ${money(P)}</td></tr>
-      <tr><td>Costo de entrega</td><td class="n">${cur} ${money(S)}</td></tr>
-      <tr><td>Tarifa de servicio</td><td class="n">${cur} ${money(Fe)}</td></tr>
-      <tr class="tot"><td>Total a transferir</td><td class="n">${cur} ${money(T)}</td></tr>
-      ${bank?`<tr><td>Datos para la transferencia</td><td style="white-space:pre-line">${esc(bank)}</td></tr>`:""}
-    </table>
-    <ol>
-      <li>Cerquita acepta el encargo descrito y se compromete a ejecutarlo una vez confirmada la transferencia por el total indicado.</li>
-      <li>Esta cotización es válida hasta el ${esc(venceTxt)}. Pasado ese plazo, los precios podrán actualizarse previa consulta con el cliente.</li>
-      <li>Las compras se realizarán únicamente por lo aprobado. Cualquier sustitución de productos se consultará con el cliente antes de realizarse, y todo excedente será devuelto o acreditado como saldo a favor.</li>
-      <li>El cliente recibirá copia escaneada de las facturas de compra. La entrega se hará solo a la persona que confirme el PIN del pedido, con recibí conforme firmado y comprobante fotográfico.</li>
-    </ol>
-    <div class="ts">
-      <div class="sigb"><img src="${aPad.url()}" alt="Firma de ${v("aName")}"><div class="ln"><b>${v("aName")}</b><br>${v("aRole")} · Cerquita</div></div>
-      <div class="stamp" aria-hidden="true">ACEPTADO<small>${esc(hora)}</small></div>
-    </div>
-  </div>
-  <footer class="df">Documento generado electrónicamente por Cerquita el ${esc(fecha)} a las ${esc(hora)}. Conserve este documento como respaldo de su pedido.</footer>`;
+  const ver=("AC"+code.replace(/\D/g,"").slice(-6)+now.getTime().toString(36).slice(-4)).toUpperCase();
+  const corta=now.toLocaleDateString("es-NI",{timeZone:tz,day:"2-digit",month:"short",year:"numeric"});
+  const rs=qRows(),priced=rs.some(r=>r.p);
+  const aSigT=(()=>{const c=$("aSig"),x=c.getContext("2d"),W=c.width,H=c.height,d=x.getImageData(0,0,W,H).data;let x0=W,y0=H,x1=-1,y1=-1;
+    for(let y=0;y<H;y++)for(let i=0;i<W;i++)if(d[(y*W+i)*4+3]>10){if(i<x0)x0=i;if(i>x1)x1=i;if(y<y0)y0=y;if(y>y1)y1=y}
+    if(x1<0)return {u:c.toDataURL("image/png"),w:200,h:70};const p=8;x0=Math.max(0,x0-p);y0=Math.max(0,y0-p);x1=Math.min(W-1,x1+p);y1=Math.min(H-1,y1+p);
+    const o=document.createElement("canvas");o.width=x1-x0+1;o.height=y1-y0+1;o.getContext("2d").drawImage(c,x0,y0,o.width,o.height,0,0,o.width,o.height);
+    const k=Math.min(220/o.width,80/o.height);return {u:o.toDataURL("image/png"),w:Math.round(o.width*k),h:Math.round(o.height*k)}})();
+  $("doc").innerHTML=`<div class="vh">${dLogo}<div class="bn">cerquita</div><small>Compras de confianza · Managua</small><small>WhatsApp +505 8707 2125</small></div>
+    <div class="vt">CONSTANCIA DE<br>ACEPTACIÓN DE PEDIDO</div>
+    <div class="ok"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7 12.5l3.2 3.2L17 9"/></svg>Pedido aceptado</div><hr>
+    <div class="ln"><span>Documento</span><span>${esc(docNo)}</span></div>
+    <div class="ln"><span>Pedido</span><span>${esc(code)}</span></div>
+    <div class="ln"><span>Fecha de aceptación</span><span>${esc(corta)}</span></div>
+    <div class="ln"><span>Hora de aceptación</span><span>${esc(hora)}</span></div><hr>
+    <div class="ln"><span>Cliente</span><span>${v("aClient")}</span></div>
+    ${$("aCountry").value.trim()?`<div class="ln"><span>País</span><span>${v("aCountry")}</span></div>`:""}
+    ${$("aWa").value.trim()?`<div class="ln"><span>WhatsApp</span><span>${v("aWa")}</span></div>`:""}
+    <div class="ln"><span>Beneficiario</span><span>${v("aBenef")}</span></div>
+    <div class="ln"><span>Entrega estimada</span><span>${esc(ent)}</span></div><hr>
+    ${priced?rs.map(r=>`<div class="ln"><span>${esc(r.n)} × ${r.q}${r.det?`<br><small>${esc(r.det)}</small>`:""}</span><span>${r.p?esc(cur+" "+money(r.s)):"—"}</span></div>`).join(""):
+      `<div class="ln"><span>Encargo</span><span style="white-space:pre-line;text-align:left">${v("aDesc")}</span></div>`}<hr>
+    <div class="ln"><span>Productos</span><span>${esc(cur+" "+money(P))}</span></div>
+    <div class="ln"><span>Costo de entrega</span><span>${esc(cur+" "+money(S))}</span></div>
+    <div class="ln"><span>Tarifa de servicio</span><span>${esc(cur+" "+money(Fe))}</span></div>
+    <div class="amt"><small>TOTAL A TRANSFERIR</small><b>${esc(cur+" "+money(T))}</b><small>Cotización válida hasta el ${esc(venceTxt)}</small></div>
+    ${bank?`<hr><div class="ln"><span>Datos para la transferencia</span><span style="white-space:pre-line">${esc(bank)}</span></div>`:""}<hr>
+    <p class="fine" style="margin-top:0">Cerquita acepta el encargo descrito y lo ejecutará una vez confirmada la transferencia por el total indicado. Se comprará únicamente lo aprobado; cualquier sustitución se consultará antes con el cliente y todo excedente será devuelto o acreditado como saldo a favor. El cliente recibirá copia escaneada de las facturas. La entrega se hará solo a quien confirme el PIN del pedido, con recibí conforme firmado y comprobante fotográfico.</p>
+    <div class="dsig"><img src="${aSigT.u}" style="width:${aSigT.w}px;height:${aSigT.h}px" alt="Firma de ${v("aName")}"><div class="sl">${v("aName")}<small>${v("aRole")} · Cerquita</small></div></div><hr>
+    ${qrSvg([`CERQUITA · Constancia de aceptación de pedido`,`Documento: ${docNo}`,`Pedido: ${code}`,`Aceptado: ${corta} ${hora}`,`Cliente: ${$("aClient").value.trim()}`,
+      `Beneficiario: ${$("aBenef").value.trim()}`,`Total a transferir: ${cur} ${money(T)}`,`Válida hasta: ${venceTxt}`,`Aceptado por: ${$("aName").value.trim()}`,`Verificación: ${ver}`,`WhatsApp +505 8707 2125`].join("\n"),117)}
+    <div class="qrc">Escanee el código para ver los datos del pedido</div><div class="code">${esc(ver)}</div>
+    <p class="fine">Constancia emitida electrónicamente por Cerquita el ${esc(fecha)} a las ${esc(hora)} (hora de Managua). Consérvela como respaldo de su pedido.</p>
+    <div class="sg">Lo pedís desde lejos. Lo ves llegar.</div>`+tearHtml();
   storeOrder(code,{codigo:code,cliente:$("aClient").value.trim(),pais:$("aCountry").value.trim(),whatsapp:$("aWa").value.trim(),beneficiario:$("aBenef").value.trim(),
     articulos:$("aDesc").value.trim(),moneda:cur,total:money(T),fechaAceptacion:fecha+" "+hora,fechaEntrega:ent});
   docText=[`*CERQUITA · CONSTANCIA DE ACEPTACIÓN DE PEDIDO*`,`Documento N.º ${docNo} · Pedido ${code}`,`Paso 2 de 6 · Cotización y aceptación ✓`,`Lo que sigue: paso 3, confirmación de tu pago.`,``,`Aceptado el ${fecha} a las ${hora} (hora de Managua)`,``,
@@ -2222,8 +2225,8 @@ $("h").addEventListener("submit",e=>{
     .catch(()=>{$("dMsg").textContent="La constancia está lista, pero no se pudo registrar en el panel. Revisá tu conexión."});}
   $("h").style.display="none";$("docWrap").style.display="block";$("docWrap").scrollIntoView({behavior:"smooth",block:"start"});
 });
-$("dCopy").addEventListener("click",()=>sendPdf($("doc"),"Constancia-"+(lastDocNo||"pedido")+".pdf",$("aWa").value,docText,$("dMsg"),"Constancia de aceptación de pedido"));
-$("dDown").addEventListener("click",()=>downPdf($("doc"),"Constancia-"+(lastDocNo||"pedido")+".pdf",$("dMsg")));
+$("dCopy").addEventListener("click",()=>sendPdf($("doc"),"Constancia-"+(lastDocNo||"pedido")+".pdf",$("aWa").value,docText,$("dMsg"),"Constancia de aceptación de pedido","ticket"));
+$("dDown").addEventListener("click",()=>downPdf($("doc"),"Constancia-"+(lastDocNo||"pedido")+".pdf",$("dMsg"),"ticket"));
 $("dNew").addEventListener("click",()=>{$("h").reset();qPrices={};renderQuote();aCalc();$("docWrap").style.display="none";$("h").style.display="";aPad.resize();window.scrollTo(0,0)});
 
 function aviso(){const c=$("uCode").value.trim().toUpperCase()||"(pedido)",s=+$("uStep").value,eta=$("uEta").value;
