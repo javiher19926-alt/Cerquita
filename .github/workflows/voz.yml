@@ -1,0 +1,18 @@
+name: Generar voz del video
+on:
+  push:
+    branches: [video-voz]
+    paths: ["tts/guion.json", "tts/gen.py"]
+permissions:
+  contents: write
+jobs:
+  voz:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -q edge-tts && mkdir -p tts/out && python tts/gen.py && ls -la tts/out
+      - run: |
+          git config user.name "cerquita-bot"; git config user.email "bot@users.noreply.github.com"
+          git add tts/out && git commit -m "Voz generada" && git push
