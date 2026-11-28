@@ -2,26 +2,43 @@ package ni.cerquita.app;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.net.http.SslError;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
+import android.webkit.RenderProcessGoneDetail;
+import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -49,6 +66,21 @@ public class MainActivity extends AppCompatActivity {
             | BiometricManager.Authenticators.BIOMETRIC_WEAK;
 
     private WebView web;
+    private FrameLayout root;
+    private LinearLayout overlay;
+    private ProgressBar spinner;
+    private TextView msgView;
+    private Button retryBtn, browserBtn;
+    private boolean mainError;
+    private String lastUrl;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Runnable slowCheck = () -> {
+        if (overlay != null && overlay.getVisibility() == View.VISIBLE && !mainError) {
+            msgView.setText("La conexión está lenta. Seguimos intentando abrir Cerquita…");
+            retryBtn.setVisibility(View.VISIBLE);
+            browserBtn.setVisibility(View.VISIBLE);
+        }
+    };
     private ValueCallback<Uri[]> fileCallback;
     private Uri cameraUri;
     private String geoOrigin;
@@ -71,11 +103,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        web = new WebView(this);
-        web.setBackgroundColor(Color.parseColor("#F7F5F0"));
-        setContentView(web);
+        root = new FrameLayout(this);
+        root.setBackgroundColor(Color.parseColor("#0B2545"));
+        setContentView(root);
+        buildOverlay();
 
-        ViewCompat.setOnApplyWindowInsetsListener(web, (v, insets) -> {
+        try {
+            web = new WebView(this);
+        } catch (Throwable t) {
+            showError("Este teléfono no tiene activo el componente «Android System WebView», que la app necesita para mostrarse.\n\nActualícelo o actívelo en Play Store y vuelva a abrir Cerquita. Mientras tanto puede usar Cerquita en el navegador.", false);
+            return;
+        }
+        web.setBackgroundColor(Color.parseColor("#F7F5F0"));
+        root.addView(web, 0, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT));
+
+        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
             Insets b = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime()
                     | WindowInsetsCompat.Type.displayCutout());
             v.setPadding(b.left, b.top, b.right, b.bottom);
@@ -89,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         s.setGeolocationEnabled(true);
         s.setMediaPlaybackRequiresUserGesture(false);
         s.setAllowFileAccess(false);
+        s.setCacheMode(WebSettings.LOAD_DEFAULT);
         s.setSupportMultipleWindows(false);
         s.setUserAgentString(s.getUserAgentString() + " CerquitaApp/" + BuildConfig.VERSION_NAME);
 
@@ -107,8 +151,53 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                mainError = false;
+                if (url != null && url.startsWith("https://")) lastUrl = url;
+            }
+
+            @Override
             public void onPageFinished(WebView view, String url) {
                 view.evaluateJavascript(BRIDGE_JS, null);
+                if (!mainError) hideOverlay();
+            }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest req, WebResourceError err) {
+                if (!req.isForMainFrame()) return;
+                mainError = true;
+                showError(friendlyError(err.getErrorCode()) + "\n\n(Detalle: " + err.getErrorCode() + " · "
+                        + err.getDescription() + ")", true);
+            }
+
+            @Override
+            public void onReceivedHttpError(WebView view, WebResourceRequest req, WebResourceResponse res) {
+                if (!req.isForMainFrame() || res.getStatusCode() < 400) return;
+                mainError = true;
+                showError("La página de Cerquita no respondió bien (error " + res.getStatusCode()
+                        + "). Puede ser un cambio que se está publicando: espere un minuto y vuelva a intentar.", true);
+            }
+
+            @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler h, SslError err) {
+                h.cancel();
+                Uri u = Uri.parse(err.getUrl() == null ? "" : err.getUrl());
+                if (!HOST.equalsIgnoreCase(u.getHost())) return;
+                mainError = true;
+                showError("El teléfono rechazó la conexión segura con Cerquita.\n\nRevise que la fecha y la hora del teléfono estén en automático y que sean correctas, y vuelva a intentar.\n\n(Detalle SSL: "
+                        + err.getPrimaryError() + ")", true);
+            }
+
+            @TargetApi(26)
+            @Override
+            public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail d) {
+                if (web != null) {
+                    root.removeView(web);
+                    web.destroy();
+                    web = null;
+                }
+                recreate();
+                return true;
             }
         });
 
@@ -158,19 +247,126 @@ public class MainActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (web.canGoBack()) web.goBack();
+                if (web != null && web.canGoBack()) web.goBack();
                 else finish();
             }
         });
 
-        if (savedInstanceState != null) web.restoreState(savedInstanceState);
-        else web.loadUrl(BuildConfig.START_URL);
+        showLoading();
+        if (savedInstanceState == null || web.restoreState(savedInstanceState) == null) {
+            web.loadUrl(BuildConfig.START_URL);
+        }
+    }
+
+    private int dp(int v) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, getResources().getDisplayMetrics());
+    }
+
+    private void buildOverlay() {
+        overlay = new LinearLayout(this);
+        overlay.setOrientation(LinearLayout.VERTICAL);
+        overlay.setGravity(Gravity.CENTER);
+        overlay.setPadding(dp(32), dp(32), dp(32), dp(32));
+        overlay.setBackgroundColor(Color.parseColor("#0B2545"));
+        overlay.setClickable(true);
+
+        TextView title = new TextView(this);
+        title.setText(getString(R.string.app_name));
+        title.setTextColor(Color.WHITE);
+        title.setTypeface(Typeface.DEFAULT_BOLD);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
+        title.setGravity(Gravity.CENTER);
+        overlay.addView(title);
+
+        spinner = new ProgressBar(this);
+        LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(dp(44), dp(44));
+        sp.topMargin = dp(24);
+        overlay.addView(spinner, sp);
+
+        msgView = new TextView(this);
+        msgView.setTextColor(Color.parseColor("#DCE6F0"));
+        msgView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        msgView.setGravity(Gravity.CENTER);
+        msgView.setLineSpacing(0, 1.2f);
+        LinearLayout.LayoutParams mp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        mp.topMargin = dp(20);
+        overlay.addView(msgView, mp);
+
+        retryBtn = new Button(this);
+        retryBtn.setText("Volver a intentar");
+        retryBtn.setAllCaps(false);
+        retryBtn.setOnClickListener(v -> retry());
+        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        bp.topMargin = dp(24);
+        overlay.addView(retryBtn, bp);
+
+        browserBtn = new Button(this);
+        browserBtn.setText("Abrir en el navegador");
+        browserBtn.setAllCaps(false);
+        browserBtn.setOnClickListener(v -> openExternal(Uri.parse(BuildConfig.START_URL)));
+        LinearLayout.LayoutParams bp2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        bp2.topMargin = dp(10);
+        overlay.addView(browserBtn, bp2);
+
+        root.addView(overlay, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT));
+    }
+
+    private void showLoading() {
+        overlay.setVisibility(View.VISIBLE);
+        spinner.setVisibility(View.VISIBLE);
+        msgView.setText("Abriendo…");
+        retryBtn.setVisibility(View.GONE);
+        browserBtn.setVisibility(View.GONE);
+        handler.removeCallbacks(slowCheck);
+        handler.postDelayed(slowCheck, 20000);
+    }
+
+    private void hideOverlay() {
+        handler.removeCallbacks(slowCheck);
+        overlay.setVisibility(View.GONE);
+    }
+
+    private void showError(String m, boolean canRetry) {
+        handler.removeCallbacks(slowCheck);
+        overlay.setVisibility(View.VISIBLE);
+        spinner.setVisibility(View.GONE);
+        msgView.setText(m);
+        retryBtn.setVisibility(canRetry ? View.VISIBLE : View.GONE);
+        browserBtn.setVisibility(View.VISIBLE);
+    }
+
+    private void retry() {
+        if (web == null) {
+            recreate();
+            return;
+        }
+        mainError = false;
+        showLoading();
+        web.loadUrl(lastUrl != null ? lastUrl : BuildConfig.START_URL);
+    }
+
+    private String friendlyError(int code) {
+        switch (code) {
+            case WebViewClient.ERROR_HOST_LOOKUP:
+            case WebViewClient.ERROR_CONNECT:
+                return "No hay conexión a internet. Revise los datos móviles o el wifi y vuelva a intentar.";
+            case WebViewClient.ERROR_TIMEOUT:
+                return "La conexión tardó demasiado. Vuelva a intentar cuando tenga mejor señal.";
+            case WebViewClient.ERROR_FAILED_SSL_HANDSHAKE:
+                return "El teléfono rechazó la conexión segura. Revise que la fecha y la hora estén en automático.";
+            default:
+                return "No se pudo abrir Cerquita.";
+        }
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle out) {
         super.onSaveInstanceState(out);
-        web.saveState(out);
+        if (web != null) web.saveState(out);
     }
 
     @Override
