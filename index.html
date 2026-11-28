@@ -488,7 +488,6 @@ footer{padding-bottom:max(40px,env(safe-area-inset-bottom))}
     <div class="full items" id="items" aria-label="Lista de lo que necesitás"></div>
     <div class="full"><button type="button" class="btn sec" id="addItem">+ Agregar otra cosa</button></div>
     <div class="full warn" id="warn" role="alert">Cerquita no compra ni entrega licores, cervezas ni ninguna sustancia prohibida. Quite ese artículo para poder continuar.</div>
-    <label><span>Presupuesto máximo <span class="hint">(opcional)</span></span><input id="budget" inputmode="decimal" placeholder="Ej.: US$80 o C$3,000"></label>
     <label>¿Para cuándo?<input id="date" type="date"></label>
     <label>Horario preferido<select id="slot"><option>Mañana (8–12)</option><option>Tarde (12–5)</option><option>Lo antes posible</option></select></label>
     <label>¿Repetir este pedido?<select id="rec"><option value="">No, solo esta vez</option><option value="15">Sí, cada 15 días</option><option value="30">Sí, cada mes</option></select></label>
@@ -620,7 +619,7 @@ function numberItems(){[...$("items").children].forEach((r,i)=>{r.querySelector(
 $("addItem").addEventListener("click",()=>{addItem();$("items").lastChild.querySelector("input").focus()});
 $("items").addEventListener("click",e=>{if(e.target.matches(".icon-btn")){e.target.closest(".item").remove();if(!$("items").children.length)addItem();numberItems();update()}});
 
-const F=["sName","sCountry","sPhone","sMail","rName","rRel","rPhone","rDep","rMun","rDist","rBarrio","rAddr","rLoc","budget","date","slot","rec","notes","card"];
+const F=["sName","sCountry","sPhone","sMail","rName","rRel","rPhone","rDep","rMun","rDist","rBarrio","rAddr","rLoc","date","slot","rec","notes","card"];
 const val=id=>$(id).value.trim();
 const cats=()=>[...document.querySelectorAll("#cats input:checked")].map(i=>i.value);
 const items=()=>[...document.querySelectorAll(".item")].map(r=>{const o={d:r.querySelector(".iDesc").value.trim(),q:r.querySelector(".iQty").value.trim(),x:{}};
@@ -785,7 +784,7 @@ $("f").addEventListener("submit",e=>{
   lastText=[`*Nuevo pedido Cerquita ${code}*`,``,`*Envía:* ${val("sName")} (${val("sCountry")})`,`WhatsApp: ${val("sPhone")}${val("sMail")?" · "+val("sMail"):""}`,``,
     `*Recibe:* ${val("rName")} (${val("rRel")}) · Tel. ${val("rPhone")}`,zona(),`Dirección: ${val("rAddr")}`,`Ubicación: ${locUrl()||"no enviada (confirmar por teléfono)"}`,``,
     `*Tipo:* ${cs}`,`*Lista:*`,...items().map(i=>{const t=detTxt(i.x);return `• ${i.q?i.q+" × ":""}${i.d}${t?"\n   ↳ "+t:""}`}),
-    val("notes")?`Indicaciones: ${val("notes")}`:"",val("budget")?`Presupuesto máximo: ${val("budget")}`:"",
+    val("notes")?`Indicaciones: ${val("notes")}`:"",
     `Entrega: ${val("date")||"por definir"} · ${val("slot")} · Vehículo sugerido: ${vehicle()}`,val("rec")?`*Pedido recurrente:* ${val("rec")==="15"?"cada 15 días":"cada mes"}`:"",
     val("card")?`Tarjeta: "${val("card")}"`:"",``,`*PIN de entrega:* ${pin} (uso interno de Cerquita para verificar)`].filter((l,i,a)=>l!==""||a[i-1]!=="").join("\n");
   storeOrder(code,{codigo:code,cliente:val("sName"),pais:val("sCountry"),whatsapp:val("sPhone"),correo:val("sMail"),beneficiario:val("rName"),parentesco:val("rRel"),
@@ -804,7 +803,7 @@ $("f").addEventListener("submit",e=>{
   if(API_URL){reg.textContent="Registrando su pedido en Cerquita…";
     api({action:"nuevo",pedido:{codigo:code,cliente:val("sName"),pais:val("sCountry"),whatsapp:val("sPhone"),correo:val("sMail"),
       beneficiario:val("rName"),parentesco:val("rRel"),telBeneficiario:val("rPhone"),departamento:val("rDep"),municipio:val("rMun"),distrito:$("rDistL").style.display==="none"?"":val("rDist"),barrio:val("rBarrio"),
-      direccion:val("rAddr"),ubicacion:locUrl()||"",tipo:cs,articulos:artTxt,indicaciones:val("notes"),presupuesto:val("budget"),
+      direccion:val("rAddr"),ubicacion:locUrl()||"",tipo:cs,articulos:artTxt,indicaciones:val("notes"),
       fechaDeseada:val("date"),horario:val("slot"),vehiculo:vehicle(),tarjeta:val("card"),pin,ck,recurrencia:val("rec")?(val("rec")==="15"?"Cada 15 días":"Cada mes"):""}})
     .then(r=>{reg.textContent=r&&r.ok?"Su pedido quedó registrado en Cerquita ✓ Envíelo también por WhatsApp para atenderle más rápido.":"No pudimos registrarlo automáticamente. Envíelo por WhatsApp."})
     .catch(()=>{reg.textContent="No pudimos registrarlo automáticamente. Envíelo por WhatsApp."});
